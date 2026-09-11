@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — প্রাইভেসি পলিসি</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .policy-content h3 { margin-top: 22px; font-size: 16px; }
+    .policy-content p, .policy-content li { font-size: 14px; line-height: 1.8; color: var(--ink); }
+    .policy-content ul { padding-right: 18px; margin: 8px 0; }
+    .updated-note { font-size:12.5px; color: var(--ink-muted); margin-bottom: var(--space-4); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row" style="gap:10px; margin-bottom:6px;">
+        <button class="back-btn" onclick="window.location.href='settings.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <h1 style="margin:0;" data-i18n="privacyPolicy">প্রাইভেসি পলিসি</h1>
+      </div>
+      <p data-i18n="privacyTagline">আপনার তথ্যের নিরাপত্তা আমাদের অগ্রাধিকার</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="card policy-content lang-bn">
+        <p class="updated-note">সর্বশেষ হালনাগাদ: সেপ্টেম্বর ২০২৬</p>
+
+        <p>Minbar Assistant ("আমরা", "আমাদের", "অ্যাপ") ব্যবহার করে আপনি এই প্রাইভেসি পলিসিতে সম্মত হচ্ছেন। আমরা আপনার গোপনীয়তাকে গুরুত্ব সহকারে দেখি এবং আপনার তথ্য কীভাবে সংগ্রহ, ব্যবহার ও সুরক্ষিত রাখি তা এখানে ব্যাখ্যা করা হলো।</p>
+
+        <h3>১. আমরা কী তথ্য সংগ্রহ করি</h3>
+        <ul>
+          <li><b>অ্যাকাউন্ট তথ্য:</b> নাম, ইমেইল ঠিকানা, পাসওয়ার্ড (এনক্রিপ্টেড আকারে)</li>
+          <li><b>আপনার তৈরি কনটেন্ট:</b> বায়ান, দাওয়াতের তথ্য, আয়-ব্যয়ের হিসাব, কাস্টমার তথ্য, প্রতিষ্ঠানের তথ্য</li>
+          <li><b>ডিভাইস তথ্য:</b> নোটিফিকেশন পাঠানোর জন্য পুশ সাবস্ক্রিপশন তথ্য (আপনি চালু করলে)</li>
+          <li><b>স্থানীয় সেটিংস:</b> থিম পছন্দ, অ্যাপ লক (আপনার ফোনেই সংরক্ষিত, আমাদের সার্ভারে যায় না)</li>
+        </ul>
+
+        <h3>২. আমরা কীভাবে তথ্য ব্যবহার করি</h3>
+        <ul>
+          <li>অ্যাপের মূল ফিচারগুলো (বায়ান, দাওয়াত, হিসাব ব্যবস্থাপনা) সচল রাখতে</li>
+          <li>আপনাকে দাওয়াতের রিমাইন্ডার নোটিফিকেশন পাঠাতে (আপনি অনুমতি দিলে)</li>
+          <li>অ্যাকাউন্ট নিরাপত্তা ও যাচাইকরণের জন্য</li>
+          <li>প্রিমিয়াম AI সহকারী ফিচার সক্রিয় থাকলে, আপনার বায়ান আর্কাইভ বিশ্লেষণ করে সহায়তা দিতে</li>
+        </ul>
+
+        <h3>৩. তথ্য সংরক্ষণ ও নিরাপত্তা</h3>
+        <p>আপনার সব তথ্য Supabase-এর নিরাপদ ক্লাউড ডেটাবেজে সংরক্ষিত থাকে, যেখানে Row Level Security (RLS) ব্যবহার করা হয় — অর্থাৎ আপনার প্রতিষ্ঠানের তথ্য শুধু আপনি ও আপনার নির্ধারিত সদস্যরাই দেখতে পারবেন, অন্য কোনো ব্যবহারকারী নয়। পাসওয়ার্ড কখনোই প্লেইন টেক্সটে সংরক্ষিত হয় না।</p>
+
+        <h3>৪. তৃতীয় পক্ষের সেবা</h3>
+        <ul>
+          <li><b>Supabase:</b> আমাদের ডেটাবেজ ও অথেনটিকেশন সেবা প্রদানকারী</li>
+          <li><b>Anthropic (Claude AI):</b> শুধুমাত্র প্রিমিয়াম AI সহকারী ফিচার সক্রিয় করা হলে ব্যবহৃত হয়</li>
+        </ul>
+        <p>আমরা আপনার ব্যক্তিগত তথ্য কোনো বিজ্ঞাপনদাতা বা তৃতীয় পক্ষের কাছে বিক্রি করি না।</p>
+
+        <h3>৫. আপনার অধিকার</h3>
+        <ul>
+          <li>আপনার সংরক্ষিত তথ্য দেখার অধিকার</li>
+          <li>ভুল তথ্য সংশোধনের অধিকার</li>
+          <li>হিসাব/বায়ান/দাওয়াতের তথ্য এক্সপোর্ট করার অধিকার (Excel/PDF আকারে)</li>
+          <li>অ্যাকাউন্ট ও সংশ্লিষ্ট সব তথ্য মুছে ফেলার অনুরোধ করার অধিকার</li>
+        </ul>
+
+        <h3>৬. তথ্য সংরক্ষণের মেয়াদ</h3>
+        <p>যতদিন আপনার অ্যাকাউন্ট সক্রিয় থাকবে, ততদিন তথ্য সংরক্ষিত থাকবে। অ্যাকাউন্ট মুছে ফেলার অনুরোধ করলে যুক্তিসঙ্গত সময়ের মধ্যে তথ্য স্থায়ীভাবে মুছে ফেলা হবে।</p>
+
+        <h3>৭. শিশুদের গোপনীয়তা</h3>
+        <p>এই অ্যাপ সাধারণ ব্যবহারকারীদের (ইমাম, প্রতিষ্ঠান পরিচালক) জন্য তৈরি এবং শিশুদের জন্য নয়। আমরা জেনেশুনে ১৩ বছরের কম বয়সী কারো তথ্য সংগ্রহ করি না।</p>
+
+        <h3>৮. কুকি ও লোকাল স্টোরেজ</h3>
+        <p>অ্যাপটি লগইন সেশন বজায় রাখতে এবং থিম/লক পছন্দ মনে রাখতে আপনার ব্রাউজারের লোকাল স্টোরেজ ব্যবহার করে। এতে কোনো ট্র্যাকিং বা বিজ্ঞাপন কুকি ব্যবহার করা হয় না।</p>
+
+        <h3>৯. নীতিমালার পরিবর্তন</h3>
+        <p>এই প্রাইভেসি পলিসি সময়ে সময়ে আপডেট হতে পারে। উল্লেখযোগ্য পরিবর্তন হলে অ্যাপের মাধ্যমে জানানো হবে।</p>
+
+        <h3>১০. যোগাযোগ</h3>
+        <p>এই পলিসি নিয়ে কোনো প্রশ্ন থাকলে অ্যাপ পরিচালকের সাথে যোগাযোগ করুন।</p>
+      </div>
+
+      <div class="card policy-content lang-en" style="display:none;">
+        <p class="updated-note">Last updated: September 2026</p>
+
+        <p>By using Minbar Assistant ("we", "us", "the app"), you agree to this Privacy Policy. We take your privacy seriously, and this page explains how we collect, use, and protect your information.</p>
+
+        <h3>1. Information We Collect</h3>
+        <ul>
+          <li><b>Account information:</b> name, email address, password (stored encrypted)</li>
+          <li><b>Content you create:</b> Bayan, Dawat details, income/expense records, customer information, institution details</li>
+          <li><b>Device information:</b> push subscription details for sending notifications (only if you enable it)</li>
+          <li><b>Local settings:</b> theme preference, app lock (stored only on your device, never sent to our servers)</li>
+        </ul>
+
+        <h3>2. How We Use Your Information</h3>
+        <ul>
+          <li>To operate the app's core features (Bayan, Dawat, finance management)</li>
+          <li>To send you Dawat reminder notifications (if you grant permission)</li>
+          <li>For account security and verification</li>
+          <li>If the premium AI Assistant feature is active, to analyze your Bayan archive to assist you</li>
+        </ul>
+
+        <h3>3. Data Storage & Security</h3>
+        <p>All your data is stored in Supabase's secure cloud database with Row Level Security (RLS) enabled — meaning your institution's data is only visible to you and your designated members, never to other users. Passwords are never stored in plain text.</p>
+
+        <h3>4. Third-Party Services</h3>
+        <ul>
+          <li><b>Supabase:</b> our database and authentication provider</li>
+          <li><b>Anthropic (Claude AI):</b> used only when the premium AI Assistant feature is activated</li>
+        </ul>
+        <p>We do not sell your personal information to any advertiser or third party.</p>
+
+        <h3>5. Your Rights</h3>
+        <ul>
+          <li>The right to view your stored information</li>
+          <li>The right to correct inaccurate information</li>
+          <li>The right to export your finance/Bayan/Dawat data (as Excel/PDF)</li>
+          <li>The right to request deletion of your account and all related data</li>
+        </ul>
+
+        <h3>6. Data Retention</h3>
+        <p>Your data is retained as long as your account remains active. If you request account deletion, your data will be permanently deleted within a reasonable timeframe.</p>
+
+        <h3>7. Children's Privacy</h3>
+        <p>This app is designed for general users (imams, institution administrators) and not for children. We do not knowingly collect information from anyone under 13.</p>
+
+        <h3>8. Cookies & Local Storage</h3>
+        <p>The app uses your browser's local storage to maintain your login session and remember your theme/lock preferences. No tracking or advertising cookies are used.</p>
+
+        <h3>9. Changes to This Policy</h3>
+        <p>This Privacy Policy may be updated from time to time. Significant changes will be communicated through the app.</p>
+
+        <h3>10. Contact</h3>
+        <p>If you have any questions about this policy, please contact the app administrator.</p>
+      </div>
+    </main>
+  </div>
+  <script src="../js/i18n.js"></script>
+  <script>applyTranslations();</script>
+</body>
+</html>

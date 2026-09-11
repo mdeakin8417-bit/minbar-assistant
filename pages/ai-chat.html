@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — AI সহকারী</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    html, body { height: 100%; }
+    .chat-shell { display:flex; flex-direction:column; height:100dvh; max-width:480px; margin:0 auto; background:var(--parchment); }
+    .chat-header {
+      background: var(--teal-800); color: var(--parchment); padding: 16px 18px;
+      display:flex; align-items:center; gap:12px; flex-shrink:0;
+    }
+    .chat-header h1 { color: var(--parchment); font-size:18px; margin:0; }
+    .chat-body { flex:1; overflow-y:auto; padding: 16px; display:flex; flex-direction:column; gap:12px; }
+    .msg { max-width: 82%; padding: 11px 14px; border-radius: var(--radius-md); font-size: 14.5px; line-height:1.6; white-space:pre-wrap; }
+    .msg.user { align-self:flex-end; background: var(--teal-800); color: var(--parchment); border-bottom-right-radius:4px; }
+    .msg.assistant { align-self:flex-start; background: var(--surface); border:1px solid var(--border); border-bottom-left-radius:4px; }
+    .msg.system { align-self:center; background: var(--surface-sunken); color: var(--ink-muted); font-size:13px; text-align:center; }
+    .typing-dots { display:flex; gap:4px; padding: 4px 0; }
+    .typing-dots span { width:6px; height:6px; border-radius:50%; background: var(--ink-faint); animation: blink 1.2s infinite; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%, 80%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
+
+    .chat-input-bar {
+      flex-shrink:0; display:flex; gap:8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: var(--surface); border-top: 1px solid var(--border);
+    }
+    .chat-input-bar textarea {
+      flex:1; resize:none; border:1.5px solid var(--border-strong); border-radius: var(--radius-md);
+      padding: 10px 14px; font-family: var(--font-body); font-size: 15px; max-height: 100px; background:var(--surface); color:var(--ink);
+    }
+    .send-btn {
+      width:44px; height:44px; border-radius:50%; background: var(--gold-600); color: var(--teal-900);
+      border:none; font-size:18px; cursor:pointer; flex-shrink:0;
+    }
+    .send-btn:disabled { opacity:0.5; }
+    .empty-hint { text-align:center; color: var(--ink-muted); padding: 40px 20px; }
+    .suggestion-chip {
+      display:inline-block; margin: 4px; padding: 8px 14px; border-radius: var(--radius-pill);
+      background: var(--surface); border: 1.5px solid var(--border-strong); font-size: 13px; cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-shell">
+    <div class="chat-header">
+      <button class="back-btn" onclick="window.location.href='settings.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      </button>
+      <h1 data-i18n="aiChatTitle">🤖 AI সহকারী</h1>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+      <div class="empty-hint" id="emptyHint">
+        <div style="font-size:36px; margin-bottom:8px;">🤖</div>
+        <p data-i18n="aiChatGreeting">আসসালামু আলাইকুম! আমি আপনাকে বায়ান লেখা, ইসলামিক প্রশ্নোত্তর, বা হিসাব-দাওয়াত সংক্রান্ত পরামর্শে সাহায্য করতে পারি।</p>
+        <div style="margin-top:10px;">
+          <span class="suggestion-chip" onclick="sendSuggestion(this)" data-i18n="aiSuggestion1">জুমার বায়ানের একটা বিষয় সাজেস্ট করো</span>
+          <span class="suggestion-chip" onclick="sendSuggestion(this)" data-i18n="aiSuggestion2">সবরের ওপর একটা ছোট বায়ানের খসড়া লিখে দাও</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-bar">
+      <textarea id="msgInput" rows="1" placeholder="আপনার প্রশ্ন লিখুন..." data-i18n-placeholder="aiChatPlaceholder"></textarea>
+      <button class="send-btn" id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let conversationId = null;
+    let institutionId = null;
+
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str || "";
+      return d.innerHTML;
+    }
+
+    function addMessage(role, text) {
+      document.getElementById("emptyHint").style.display = "none";
+      const body = document.getElementById("chatBody");
+      const el = document.createElement("div");
+      el.className = "msg " + role;
+      el.textContent = text;
+      body.appendChild(el);
+      body.scrollTop = body.scrollHeight;
+      return el;
+    }
+
+    function addTypingIndicator() {
+      const body = document.getElementById("chatBody");
+      const el = document.createElement("div");
+      el.className = "msg assistant";
+      el.id = "typingIndicator";
+      el.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+      body.appendChild(el);
+      body.scrollTop = body.scrollHeight;
+    }
+    function removeTypingIndicator() {
+      const el = document.getElementById("typingIndicator");
+      if (el) el.remove();
+    }
+
+    async function sendMessage(text) {
+      if (!text.trim()) return;
+      addMessage("user", text);
+      document.getElementById("msgInput").value = "";
+      document.getElementById("sendBtn").disabled = true;
+      addTypingIndicator();
+
+      try {
+        const { data, error } = await db.functions.invoke("ai-chat", {
+          body: { message: text, conversationId, institutionId },
+        });
+
+        removeTypingIndicator();
+        document.getElementById("sendBtn").disabled = false;
+
+        if (error) {
+          addMessage("system", "সংযোগে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+          return;
+        }
+        if (data.conversationId) conversationId = data.conversationId;
+        if (data.error) {
+          addMessage("system", data.error);
+          return;
+        }
+        addMessage("assistant", data.reply);
+      } catch (e) {
+        removeTypingIndicator();
+        document.getElementById("sendBtn").disabled = false;
+        addMessage("system", "সংযোগে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+      }
+    }
+
+    function sendSuggestion(el) {
+      sendMessage(el.textContent);
+    }
+
+    document.getElementById("sendBtn").addEventListener("click", () => {
+      sendMessage(document.getElementById("msgInput").value);
+    });
+    document.getElementById("msgInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage(document.getElementById("msgInput").value);
+      }
+    });
+    document.getElementById("msgInput").addEventListener("input", function () {
+      this.style.height = "auto";
+      this.style.height = Math.min(this.scrollHeight, 100) + "px";
+    });
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status === "ok") institutionId = inst.id;
+    })();
+  </script>
+</body>
+</html>

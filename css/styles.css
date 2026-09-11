@@ -1,0 +1,357 @@
+/* ==========================================================
+   Minbar Assistant — Design System
+   একটি মিহরাব/মিনবারের স্থাপত্য থেকে অনুপ্রাণিত, শান্ত ও মর্যাদাপূর্ণ ডিজাইন
+   ========================================================== */
+
+:root {
+  /* রঙ — মসজিদের গম্বুজের গাঢ় সবুজ, মিনবারের কাঠ ও পিতলের সোনালি, পুরনো কাগজের রং */
+  --teal-900: #0F2E29;
+  --teal-800: #123832;
+  --teal-700: #1B4A42;
+  --teal-600: #245C52;
+  --gold-700: #B3841F;
+  --gold-600: #C9982E;
+  --gold-500: #DBAF4C;
+  --parchment: #FAF6EF;
+  --surface: #FFFFFF;
+  --surface-sunken: #F2EEE3;
+  --ink: #20241F;
+  --ink-muted: #5B6660;
+  --ink-faint: #8A9490;
+  --border: #E1DCCB;
+  --border-strong: #CFC8B2;
+  --income: #2F7A52;
+  --income-bg: #E7F2EB;
+  --expense: #A6462F;
+  --expense-bg: #F7E9E4;
+  --danger: #A6342F;
+  --focus-ring: #245C52;
+
+  /* টাইপোগ্রাফি */
+  --font-heading: 'Noto Serif Bengali', 'Noto Serif', serif;
+  --font-body: 'Hind Siliguri', 'Inter', sans-serif;
+
+  /* আকার */
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --shadow-card: 0 1px 2px rgba(15, 46, 41, 0.06), 0 2px 8px rgba(15, 46, 41, 0.05);
+  --shadow-raised: 0 4px 16px rgba(15, 46, 41, 0.12);
+}
+
+/* ---------- ডার্ক মোড — একই রঙের পরিচয়, উল্টানো টোন ---------- */
+:root[data-theme="dark"] {
+  --parchment: #141F1B;
+  --surface: #1C2925;
+  --surface-sunken: #16211D;
+  --ink: #ECE7DA;
+  --ink-muted: #A9B0AB;
+  --ink-faint: #6E7873;
+  --border: #2B3733;
+  --border-strong: #3A4844;
+  --income-bg: rgba(47, 122, 82, 0.18);
+  --expense-bg: rgba(166, 70, 47, 0.18);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--parchment);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  color: var(--teal-900);
+  margin: 0 0 var(--space-2) 0;
+  line-height: 1.3;
+}
+
+h1 { font-size: 28px; font-weight: 600; }
+h2 { font-size: 22px; font-weight: 600; }
+h3 { font-size: 18px; font-weight: 600; }
+
+p { margin: 0 0 var(--space-3) 0; color: var(--ink); }
+.muted { color: var(--ink-muted); }
+.small { font-size: 13px; }
+
+a { color: var(--teal-700); }
+
+/* ফোকাস স্টেট — অ্যাক্সেসিবিলিটির জন্য জরুরি */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2.5px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ---------- লেআউট শেল ---------- */
+.app-shell {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--parchment);
+  position: relative;
+}
+
+.screen {
+  flex: 1;
+  padding: var(--space-5) var(--space-5) calc(var(--space-7) + 72px);
+}
+
+.screen--centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: var(--space-6) var(--space-5);
+}
+
+/* ---------- আর্চ হেডার (মিহরাবের আকৃতি থেকে অনুপ্রাণিত) ---------- */
+.arch-header {
+  background: var(--teal-800);
+  color: var(--parchment);
+  padding: var(--space-6) var(--space-5) var(--space-7);
+  border-radius: 0 0 40% 40% / 0 0 34px 34px;
+  position: relative;
+  overflow: hidden;
+}
+
+.arch-header__pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.10;
+  pointer-events: none;
+}
+
+.arch-header h1, .arch-header p { color: var(--parchment); position: relative; }
+.arch-header p { color: rgba(250, 246, 239, 0.75); }
+
+/* ---------- কার্ড ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-card);
+}
+
+.card + .card { margin-top: var(--space-3); }
+
+/* ---------- ফর্ম উপাদান ---------- */
+.field {
+  margin-bottom: var(--space-4);
+}
+
+.field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--teal-900);
+  margin-bottom: var(--space-2);
+}
+
+.field input, .field select, .field textarea {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 16px;
+  padding: 13px 14px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.field input::placeholder { color: var(--ink-faint); }
+
+.field-hint { font-size: 13px; color: var(--ink-muted); margin-top: var(--space-1); }
+.field-error { font-size: 13px; color: var(--danger); margin-top: var(--space-1); display: none; }
+.field.has-error input { border-color: var(--danger); }
+.field.has-error .field-error { display: block; }
+
+/* ---------- বাটন ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.08s ease, opacity 0.15s ease;
+  text-decoration: none;
+}
+
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn--primary { background: var(--gold-600); color: var(--teal-900); }
+.btn--primary:hover { background: var(--gold-500); }
+
+.btn--secondary { background: var(--teal-800); color: var(--parchment); }
+.btn--secondary:hover { background: var(--teal-700); }
+
+.btn--ghost { background: transparent; color: var(--teal-800); border: 1.5px solid var(--border-strong); }
+
+.btn--text {
+  background: none;
+  width: auto;
+  padding: 4px;
+  color: var(--teal-700);
+  font-weight: 600;
+}
+
+/* ---------- ট্যাব (লগইন/সাইনআপ) ---------- */
+.tabs {
+  display: flex;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  margin-bottom: var(--space-5);
+}
+
+.tabs button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background: var(--teal-800);
+  color: var(--parchment);
+}
+
+/* ---------- অ্যালার্ট/টোস্ট ---------- */
+.alert {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  margin-bottom: var(--space-4);
+  display: none;
+}
+.alert.show { display: block; }
+.alert--error { background: var(--expense-bg); color: var(--expense); }
+.alert--success { background: var(--income-bg); color: var(--income); }
+
+/* ---------- লোডিং স্পিনার ---------- */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(0,0,0,0.15);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- ব্যাক বাটন (গোলাকার, স্পর্শযোগ্য, সব পেজে অভিন্ন) ---------- */
+.back-btn {
+  background: rgba(250, 246, 239, 0.16);
+  border: 1.5px solid rgba(250, 246, 239, 0.25);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--parchment);
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+.back-btn:active { background: rgba(250, 246, 239, 0.32); transform: scale(0.94); }
+.back-btn svg { width: 20px; height: 20px; }
+
+/* ---------- বটম ন্যাভিগেশন ---------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 8px var(--space-2) calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -2px 12px rgba(15,46,41,0.06);
+}
+
+.bottom-nav a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-decoration: none;
+  color: var(--ink-faint);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 2px;
+  border-radius: var(--radius-sm);
+}
+
+.bottom-nav a.active { color: var(--teal-800); background: var(--surface-sunken); }
+.bottom-nav svg { width: 22px; height: 22px; }
+
+/* ---------- ইউটিলিটি ---------- */
+.stack { display: flex; flex-direction: column; gap: var(--space-3); }
+.row { display: flex; align-items: center; gap: var(--space-3); }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.text-center { text-align: center; }
+.mt-6 { margin-top: var(--space-6); }
+.mb-5 { margin-bottom: var(--space-5); }
+
+.empty-state {
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+  color: var(--ink-muted);
+}
+
+/* ---------- অ্যাপের নিজস্ব মডাল (নেটিভ alert()-এর বদলে, ডোমেইন নাম দেখাবে না) ---------- */
+.app-modal-overlay {
+  position: fixed; inset: 0; background: rgba(15, 46, 41, 0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 999; padding: 24px;
+}
+.app-modal-box {
+  background: var(--surface); border-radius: var(--radius-lg); padding: 26px 22px;
+  max-width: 340px; width: 100%; text-align: center; box-shadow: var(--shadow-raised);
+}
+.app-modal-box .app-modal-icon { font-size: 34px; margin-bottom: 10px; }
+.app-modal-box p { color: var(--ink); margin-bottom: 18px; line-height: 1.6; }
+.app-modal-box button {
+  background: var(--gold-600); color: var(--teal-900); border: none; padding: 11px 30px;
+  border-radius: var(--radius-pill); font-weight: 700; font-size: 15px; cursor: pointer; font-family: var(--font-body);
+}

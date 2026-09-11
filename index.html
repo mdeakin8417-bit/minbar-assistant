@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .boot-screen {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: var(--teal-800);
+      color: var(--parchment);
+    }
+    .boot-screen img { width: 84px; height: 84px; border-radius: 22px; }
+  </style>
+</head>
+<body>
+  <div class="boot-screen">
+    <img src="icons/icon-192.png" alt="Minbar Assistant" />
+    <div class="spinner" style="color:#DBAF4C;"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    (async function boot() {
+      const user = await getCurrentUser();
+      if (user) {
+        if (isAppLockEnabled() && !isSessionUnlocked()) {
+          window.location.replace("pages/lock.html?redirect=dashboard.html");
+          return;
+        }
+        window.location.replace("pages/dashboard.html");
+      } else {
+        window.location.replace("pages/login.html");
+      }
+    })();
+  </script>
+</body>
+</html>

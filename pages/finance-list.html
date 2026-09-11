@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — হিসাব</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: var(--space-4); scrollbar-width: none; }
+    .chip-row::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: 0 0 auto; padding: 7px 16px; border-radius: var(--radius-pill);
+      background: var(--surface); border: 1.5px solid var(--border-strong);
+      font-size: 13.5px; font-weight: 600; color: var(--ink-muted); white-space: nowrap; cursor: pointer;
+    }
+    .chip.active { background: var(--teal-800); border-color: var(--teal-800); color: var(--parchment); }
+    .inst-chip {
+      flex: 0 0 auto; padding: 7px 14px; border-radius: var(--radius-pill);
+      background: var(--surface); border: 1.5px solid var(--border-strong);
+      font-size: 13px; font-weight: 600; color: var(--ink-muted); white-space: nowrap; cursor: pointer;
+    }
+    .inst-chip.active { background: var(--gold-600); border-color: var(--gold-600); color: var(--teal-900); }
+
+    .summary-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: var(--space-4); }
+    .summary-card { border-radius: var(--radius-md); padding: 14px; }
+    .summary-card.income { background: var(--income-bg); }
+    .summary-card.expense { background: var(--expense-bg); }
+    .summary-card .amt { font-size: 20px; font-weight: 700; margin-top: 2px; }
+    .summary-card.income .amt { color: var(--income); }
+    .summary-card.expense .amt { color: var(--expense); }
+
+    /* --- ওভারভিউ কার্ড: ডোনাট চার্ট + নীট + প্রফিট মার্জিন --- */
+    .overview-card {
+      border-radius: var(--radius-lg); padding: 20px 18px; margin-bottom: var(--space-4);
+      background: var(--teal-800); color: var(--parchment);
+      display: flex; align-items: center; gap: 18px;
+      position: relative; overflow: hidden;
+    }
+    .donut {
+      width: 92px; height: 92px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: conic-gradient(var(--gold-500) 0deg, var(--gold-500) var(--income-deg, 180deg), rgba(250,246,239,0.18) var(--income-deg, 180deg));
+    }
+    .donut-inner {
+      width: 68px; height: 68px; border-radius: 50%; background: var(--teal-800);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .donut-inner .label { font-size: 9px; opacity: 0.75; }
+    .donut-inner .val { font-size: 13px; font-weight: 700; }
+    .overview-text { flex: 1; min-width: 0; }
+    .overview-text .net-label { font-size: 12px; opacity: 0.8; }
+    .overview-text .net-amt { font-size: 24px; font-weight: 700; margin: 2px 0 6px; }
+    .legend { display: flex; gap: 14px; font-size: 12px; }
+    .legend span { display:flex; align-items:center; gap:5px; }
+    .legend .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .margin-badge {
+      position: absolute; top: 14px; right: 16px; background: rgba(250,246,239,0.14);
+      border-radius: var(--radius-pill); padding: 4px 12px; font-size: 12px; font-weight: 700;
+    }
+
+    /* --- ক্যাটাগরি ব্রেকডাউন (শতাংশ বার) --- */
+    .breakdown-row { margin-bottom: 10px; }
+    .breakdown-row .row-between { margin-bottom: 4px; font-size: 13.5px; }
+    .breakdown-bar-track { height: 8px; border-radius: 999px; background: var(--surface-sunken); overflow: hidden; }
+    .breakdown-bar-fill { height: 100%; border-radius: 999px; background: var(--gold-600); }
+
+    .tx-card { display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+    .tx-card .cat { font-size: 11.5px; font-weight:700; color: var(--ink-muted); }
+    .tx-card h3 { font-size: 15.5px; margin: 2px 0; }
+    .tx-amt { font-weight: 700; font-size: 15px; }
+    .tx-amt.income { color: var(--income); }
+    .tx-amt.expense { color: var(--expense); }
+
+    .fab-wrapper {
+      position: fixed; inset: 0; max-width: 480px; margin: 0 auto; pointer-events: none; z-index: 20;
+    }
+    .fab {
+      position: absolute; pointer-events: auto; bottom: 88px; right: 20px;
+      width: 56px; height: 56px; border-radius: 50%; background: var(--gold-600); color: var(--teal-900);
+      border: none; font-size: 28px; box-shadow: var(--shadow-raised);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header" style="padding-bottom:32px;">
+      <h1 data-i18n="financeTitle">হিসাব</h1>
+      <p data-i18n="financeSubtitle">আয়-ব্যয় ও লাভ-ক্ষতির হিসাব</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="row-between" style="margin-bottom:10px; gap:8px;">
+        <div id="instSwitcher" class="chip-row" style="margin-bottom:0; flex:1; min-width:0;"></div>
+        <div style="display:flex; gap:8px; flex-shrink:0;">
+          <button id="exportBtn" title="Excel এক্সপোর্ট" style="background:var(--surface); border:1.5px solid var(--border-strong); border-radius:var(--radius-pill); width:38px; height:38px; flex-shrink:0; cursor:pointer; font-size:16px;">📤</button>
+          <button onclick="window.location.href='finance-report.html'" title="PDF রিপোর্ট" style="background:var(--surface); border:1.5px solid var(--border-strong); border-radius:var(--radius-pill); width:38px; height:38px; flex-shrink:0; cursor:pointer; font-size:16px;">📄</button>
+        </div>
+      </div>
+
+      <div class="overview-card">
+        <span class="margin-badge" id="marginBadge" style="display:none;"></span>
+        <div class="donut" id="donutChart">
+          <div class="donut-inner">
+            <span class="label">নীট</span>
+            <span class="val" id="donutNet">৳০</span>
+          </div>
+        </div>
+        <div class="overview-text">
+          <div class="net-label">এই মাসের সারসংক্ষেপ</div>
+          <div class="net-amt" id="netAmt">৳০</div>
+          <div class="legend">
+            <span><i class="dot" style="background:var(--gold-500);"></i>আয় <b id="legendIncome">৳০</b></span>
+            <span><i class="dot" style="background:rgba(250,246,239,0.4);"></i>ব্যয় <b id="legendExpense">৳০</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card income">
+          <div class="small"><span data-i18n="income">আয়</span> (<span data-i18n="thisMonth">এই মাস</span>)</div>
+          <div class="amt" id="incomeAmt">৳০</div>
+        </div>
+        <div class="summary-card expense">
+          <div class="small"><span data-i18n="expense">ব্যয়</span> (<span data-i18n="thisMonth">এই মাস</span>)</div>
+          <div class="amt" id="expenseAmt">৳০</div>
+        </div>
+      </div>
+
+      <div class="card" id="breakdownCard" style="display:none; margin-bottom: var(--space-4);">
+        <h3 style="margin-bottom:12px; font-size:16px;">📊 ব্যয়ের খাতভিত্তিক বিশ্লেষণ</h3>
+        <div id="breakdownList"></div>
+      </div>
+
+      <div class="chip-row">
+        <div class="chip active" data-type="all" data-i18n="all">সব</div>
+        <div class="chip" data-type="income" data-i18n="income">আয়</div>
+        <div class="chip" data-type="expense" data-i18n="expense">ব্যয়</div>
+      </div>
+
+      <div id="txList" class="stack">
+        <p class="muted small text-center">লোড হচ্ছে...</p>
+      </div>
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div style="font-size:36px;">💰</div>
+        <p data-i18n="noTransactions">এখনো কোনো লেনদেন যোগ করা হয়নি।</p>
+      </div>
+
+      <div class="card" id="customerLinkCard" style="display:none; margin-top:16px; cursor:pointer;" onclick="window.location.href='customers-list.html'">
+        <div class="row-between">
+          <div>
+            <h3 style="margin-bottom:2px;">🧾 <span data-i18n="customerLedger">কাস্টমার / বাকি হিসাব</span></h3>
+            <p class="small muted" style="margin:0;">দোকানের কাস্টমার তালিকা ও বাকি টাকা দেখুন</p>
+          </div>
+          <span style="font-size:20px;">→</span>
+        </div>
+      </div>
+    </main>
+
+    <div class="fab-wrapper"><button class="fab" onclick="window.location.href='finance-form.html'">+</button></div>
+
+    <nav class="bottom-nav">
+      <a href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span data-i18n="navHome">হোম</span>
+      </a>
+      <a href="bayan-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span data-i18n="navBayan">বায়ান</span>
+      </a>
+      <a href="dawat-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span data-i18n="navDawat">দাওয়াত</span>
+      </a>
+      <a href="finance-list.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span data-i18n="navFinance">হিসাব</span>
+      </a>
+      <a href="settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="navSettings">সেটিংস</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let allTx = [];
+    let activeType = "all";
+    let institutionId = null;
+    let institutionType = null;
+
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str || "";
+      return d.innerHTML;
+    }
+    function formatMoney(n) {
+      return "৳" + Number(n || 0).toLocaleString("en-BD");
+    }
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      const months = ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
+      return d.getDate() + " " + months[d.getMonth()];
+    }
+
+    function renderInstitutionSwitcher(institutions, selectedId) {
+      const el = document.getElementById("instSwitcher");
+      el.innerHTML = "";
+      institutions.forEach((inst) => {
+        const meta = INSTITUTION_TYPE_META[inst.type] || { icon: "🏷️" };
+        const chip = document.createElement("div");
+        chip.className = "inst-chip" + (inst.id === selectedId ? " active" : "");
+        chip.textContent = meta.icon + " " + inst.name;
+        chip.addEventListener("click", () => {
+          setSelectedInstitutionId(inst.id);
+          window.location.reload();
+        });
+        el.appendChild(chip);
+      });
+    }
+
+    function renderSummary(institutionType) {
+      const now = new Date();
+      const thisMonthTx = allTx.filter((t) => {
+        const d = new Date(t.transaction_date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      });
+      const income = thisMonthTx.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
+      const expense = thisMonthTx.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+      const net = income - expense;
+      const total = income + expense;
+
+      document.getElementById("incomeAmt").textContent = formatMoney(income);
+      document.getElementById("expenseAmt").textContent = formatMoney(expense);
+      document.getElementById("netAmt").textContent = (net < 0 ? "-" : "") + formatMoney(Math.abs(net));
+      document.getElementById("donutNet").textContent = (net < 0 ? "-" : "") + formatMoney(Math.abs(net));
+      document.getElementById("legendIncome").textContent = formatMoney(income);
+      document.getElementById("legendExpense").textContent = formatMoney(expense);
+
+      // ডোনাট চার্ট — আয়ের অনুপাত অনুযায়ী কোণ নির্ধারণ
+      const incomeDeg = total > 0 ? (income / total) * 360 : 0;
+      document.getElementById("donutChart").style.setProperty("--income-deg", incomeDeg + "deg");
+
+      // ব্যবসা/দোকানের জন্য লাভের হার (%) ব্যাজ
+      const marginBadge = document.getElementById("marginBadge");
+      if (institutionType === "business" && income > 0) {
+        const margin = ((net / income) * 100).toFixed(1);
+        marginBadge.textContent = "লাভের হার " + margin + "%";
+        marginBadge.style.display = "block";
+      } else {
+        marginBadge.style.display = "none";
+      }
+
+      // ব্যয়ের খাতভিত্তিক শতাংশ বিশ্লেষণ
+      const expenseTx = thisMonthTx.filter((t) => t.type === "expense");
+      const byCategory = {};
+      expenseTx.forEach((t) => {
+        const key = t.category_name || "অন্যান্য";
+        byCategory[key] = (byCategory[key] || 0) + Number(t.amount);
+      });
+      const breakdownCard = document.getElementById("breakdownCard");
+      const breakdownList = document.getElementById("breakdownList");
+      const sorted = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
+      if (sorted.length === 0 || expense === 0) {
+        breakdownCard.style.display = "none";
+      } else {
+        breakdownCard.style.display = "block";
+        breakdownList.innerHTML = sorted
+          .map(([name, amt]) => {
+            const pct = ((amt / expense) * 100).toFixed(1);
+            return `
+            <div class="breakdown-row">
+              <div class="row-between"><span>${name}</span><span><b>${pct}%</b> · ${formatMoney(amt)}</span></div>
+              <div class="breakdown-bar-track"><div class="breakdown-bar-fill" style="width:${pct}%;"></div></div>
+            </div>`;
+          })
+          .join("");
+      }
+    }
+
+    function renderList() {
+      const listEl = document.getElementById("txList");
+      const emptyEl = document.getElementById("emptyState");
+      const filtered = activeType === "all" ? allTx : allTx.filter((t) => t.type === activeType);
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = "";
+        emptyEl.style.display = "block";
+        return;
+      }
+      emptyEl.style.display = "none";
+
+      listEl.innerHTML = filtered
+        .map(
+          (t) => `
+        <div class="card tx-card" onclick="window.location.href='finance-detail.html?id=${t.id}'">
+          <div>
+            <div class="cat">${escapeHtml(t.category_name || "সাধারণ")} · ${formatDate(t.transaction_date)}</div>
+            <h3>${escapeHtml(t.description || (t.type === "income" ? "আয়" : "ব্যয়"))}</h3>
+          </div>
+          <div class="tx-amt ${t.type}">${t.type === "income" ? "+" : "-"}${formatMoney(t.amount)}</div>
+        </div>`
+        )
+        .join("");
+    }
+
+    document.querySelectorAll(".chip[data-type]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".chip[data-type]").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        activeType = chip.dataset.type;
+        renderList();
+      });
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      if (allTx.length === 0) {
+        showAppAlert("এক্সপোর্ট করার মতো কোনো লেনদেন নেই।", "📤");
+        return;
+      }
+      const rows = allTx.map((t) => ({
+        "তারিখ": t.transaction_date,
+        "ধরন": t.type === "income" ? "আয়" : "ব্যয়",
+        "ক্যাটাগরি": t.category_name || "সাধারণ",
+        "বিবরণ": t.description || "",
+        "পরিমাণ (৳)": Number(t.amount),
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws["!cols"] = [{ wch: 12 }, { wch: 8 }, { wch: 20 }, { wch: 30 }, { wch: 14 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "হিসাব");
+      const fileName = "hisab-" + new Date().toISOString().slice(0, 10) + ".xlsx";
+      XLSX.writeFile(wb, fileName);
+    });
+
+    async function loadTransactions() {
+      const { data, error } = await db
+        .from("transactions")
+        .select("id, type, amount, description, transaction_date, finance_categories(name)")
+        .eq("institution_id", institutionId)
+        .order("transaction_date", { ascending: false });
+
+      if (error) {
+        showConnectionError("লেনদেনের তথ্য লোড করা যায়নি।");
+        return;
+      }
+      allTx = (data || []).map((t) => ({ ...t, category_name: t.finance_categories ? t.finance_categories.name : null }));
+      renderSummary(institutionType);
+      renderList();
+    }
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status === "error") { showConnectionError("প্রতিষ্ঠানের তথ্য লোড করা যায়নি।"); return; }
+      if (inst.status === "empty") { window.location.replace("institution-setup.html"); return; }
+      institutionId = inst.id;
+      institutionType = inst.institution.type;
+      renderInstitutionSwitcher(inst.all, inst.id);
+      if (inst.institution.type === "business") {
+        document.getElementById("customerLinkCard").style.display = "block";
+      }
+      await loadTransactions();
+    })();
+  </script>
+</body>
+</html>

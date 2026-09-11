@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — Admin</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .stat-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-bottom: var(--space-4); }
+    .stat-card { background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-md); padding:14px 8px; text-align:center; }
+    .stat-card .num { font-size:22px; font-weight:700; color: var(--teal-800); }
+    .stat-card .label { font-size:11.5px; color: var(--ink-muted); margin-top:2px; }
+    .type-breakdown { display:flex; flex-wrap:wrap; gap:8px; margin-bottom: var(--space-4); }
+    .type-pill { background: var(--surface-sunken); border-radius: var(--radius-pill); padding:6px 12px; font-size:12.5px; font-weight:600; }
+    .fb-card { border-bottom:1px solid var(--border); padding:12px 0; }
+    .fb-card:last-child { border-bottom:none; }
+    .fb-cat { font-size:11px; font-weight:700; padding:2px 9px; border-radius: var(--radius-pill); display:inline-block; margin-bottom:6px; }
+    .fb-cat.suggestion { background: var(--income-bg); color: var(--income); }
+    .fb-cat.bug { background: var(--expense-bg); color: var(--expense); }
+    .fb-cat.complaint { background: rgba(201,152,46,0.15); color: var(--gold-700); }
+    .fb-cat.general { background: var(--surface-sunken); color: var(--ink-muted); }
+    .fb-meta { font-size:12px; color: var(--ink-faint); margin-top:6px; }
+    .filter-row { display:flex; gap:8px; overflow-x:auto; margin-bottom: var(--space-4); scrollbar-width:none; }
+    .filter-chip { flex:0 0 auto; padding:7px 14px; border-radius: var(--radius-pill); background:var(--surface); border:1.5px solid var(--border-strong); font-size:13px; font-weight:600; color:var(--ink-muted); cursor:pointer; }
+    .filter-chip.active { background: var(--teal-800); border-color: var(--teal-800); color: var(--parchment); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row" style="gap:10px; margin-bottom:6px;">
+        <button class="back-btn" onclick="window.location.href='settings.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <h1 style="margin:0;">এডমিন প্যানেল</h1>
+      </div>
+      <p>সামগ্রিক পরিসংখ্যান ও মতামত</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="num" id="statUsers">—</div><div class="label">মোট ব্যবহারকারী</div></div>
+        <div class="stat-card"><div class="num" id="statInstitutions">—</div><div class="label">মোট প্রতিষ্ঠান</div></div>
+        <div class="stat-card"><div class="num" id="statFeedback">—</div><div class="label">মোট মতামত</div></div>
+      </div>
+
+      <div class="type-breakdown" id="typeBreakdown"></div>
+
+      <h3 style="margin-bottom:10px;">মতামত ও অভিযোগ</h3>
+      <div class="filter-row">
+        <div class="filter-chip active" data-cat="all">সব</div>
+        <div class="filter-chip" data-cat="suggestion">💡 পরামর্শ</div>
+        <div class="filter-chip" data-cat="bug">🐞 বাগ</div>
+        <div class="filter-chip" data-cat="complaint">😕 অভিযোগ</div>
+        <div class="filter-chip" data-cat="general">💬 সাধারণ</div>
+      </div>
+
+      <div class="card" id="feedbackList">
+        <p class="muted small text-center">লোড হচ্ছে...</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    const ADMIN_USER_ID = "8581fa4f-c7d7-4b02-a63e-c9c2b8a6eabb";
+    const CAT_LABELS = { suggestion: "💡 পরামর্শ", bug: "🐞 বাগ", complaint: "😕 অভিযোগ", general: "💬 সাধারণ" };
+    let allFeedback = [];
+    let activeCat = "all";
+
+    function escapeHtml(str) { const d = document.createElement("div"); d.textContent = str || ""; return d.innerHTML; }
+    function formatDateTime(str) {
+      const d = new Date(str);
+      const months = ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
+      return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
+    }
+
+    function renderFeedback() {
+      const list = activeCat === "all" ? allFeedback : allFeedback.filter((f) => f.category === activeCat);
+      const el = document.getElementById("feedbackList");
+      if (list.length === 0) {
+        el.innerHTML = '<p class="muted small text-center">কোনো মতামত নেই।</p>';
+        return;
+      }
+      el.innerHTML = list
+        .map(
+          (f) => `
+        <div class="fb-card">
+          <span class="fb-cat ${f.category}">${CAT_LABELS[f.category] || f.category}</span>
+          <p style="margin:0;">${escapeHtml(f.message)}</p>
+          <div class="fb-meta">${escapeHtml(f.profile_name || "অজানা")} · ${formatDateTime(f.created_at)}${f.institution_name ? " · " + escapeHtml(f.institution_name) : ""}</div>
+        </div>`
+        )
+        .join("");
+    }
+
+    document.querySelectorAll(".filter-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        activeCat = chip.dataset.cat;
+        renderFeedback();
+      });
+    });
+
+    async function loadStats() {
+      const { count: userCount } = await db.from("profiles").select("*", { count: "exact", head: true });
+      const { data: institutions } = await db.from("institutions").select("type");
+      const { count: feedbackCount } = await db.from("feedback").select("*", { count: "exact", head: true });
+
+      document.getElementById("statUsers").textContent = userCount ?? 0;
+      document.getElementById("statInstitutions").textContent = (institutions || []).length;
+      document.getElementById("statFeedback").textContent = feedbackCount ?? 0;
+
+      const typeCounts = {};
+      (institutions || []).forEach((i) => { typeCounts[i.type] = (typeCounts[i.type] || 0) + 1; });
+      const typeLabels = { personal: "👤 ব্যক্তিগত", mosque: "🕌 মসজিদ", madrasa: "📖 মাদ্রাসা", hostel: "🏨 হোস্টেল", business: "🏪 ব্যবসা" };
+      document.getElementById("typeBreakdown").innerHTML = Object.entries(typeCounts)
+        .map(([type, cnt]) => `<span class="type-pill">${typeLabels[type] || type}: ${cnt}</span>`)
+        .join("");
+    }
+
+    async function loadFeedback() {
+      const { data, error } = await db
+        .from("feedback")
+        .select("id, category, message, created_at, user_id, institution_id")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        document.getElementById("feedbackList").innerHTML = '<p class="muted small text-center">লোড করা যায়নি।</p>';
+        return;
+      }
+
+      const userIds = [...new Set((data || []).map((f) => f.user_id))];
+      const instIds = [...new Set((data || []).map((f) => f.institution_id).filter(Boolean))];
+
+      const { data: profiles } = userIds.length ? await db.from("profiles").select("id, full_name").in("id", userIds) : { data: [] };
+      const { data: insts } = instIds.length ? await db.from("institutions").select("id, name").in("id", instIds) : { data: [] };
+
+      const profileMap = Object.fromEntries((profiles || []).map((p) => [p.id, p.full_name]));
+      const instMap = Object.fromEntries((insts || []).map((i) => [i.id, i.name]));
+
+      allFeedback = (data || []).map((f) => ({
+        ...f,
+        profile_name: profileMap[f.user_id],
+        institution_name: f.institution_id ? instMap[f.institution_id] : null,
+      }));
+      renderFeedback();
+    }
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      if (user.id !== ADMIN_USER_ID) { window.location.replace("dashboard.html"); return; }
+      await loadStats();
+      await loadFeedback();
+    })();
+  </script>
+</body>
+</html>

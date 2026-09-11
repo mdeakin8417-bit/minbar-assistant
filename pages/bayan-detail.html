@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — বায়ান বিস্তারিত</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>    .media-item img, .media-item video { width: 100%; border-radius: var(--radius-sm); display:block; }
+    .media-item a.pdf-link {
+      display:flex; align-items:center; gap:10px; padding:12px; border:1.5px solid var(--border-strong);
+      border-radius: var(--radius-sm); text-decoration:none; color: var(--teal-800); font-weight:600;
+    }
+    .content-text { white-space: pre-wrap; line-height:1.8; }
+    .icon-btn {
+      background: rgba(250,246,239,0.12); border:none; width:38px; height:38px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--parchment);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row-between">
+        <button class="back-btn" onclick="window.location.href='bayan-list.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+        <button class="icon-btn" id="deleteBtn" title="মুছুন">🗑️</button>
+      </div>
+      <h1 id="bTitle" style="margin-top:8px;">লোড হচ্ছে...</h1>
+      <p id="bMeta"></p>
+    </header>
+
+    <main class="screen" style="margin-top:-20px;">
+      <div id="mediaContainer" class="stack" style="margin-bottom: var(--space-4);"></div>
+      <div class="card">
+        <p class="content-text" id="bContent"></p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    const params = new URLSearchParams(window.location.search);
+    const bayanId = params.get("id");
+
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str || "";
+      return d.innerHTML;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      const months = ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
+      return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
+    }
+
+    async function load() {
+      if (!bayanId) { window.location.href = "bayan-list.html"; return; }
+
+      const { data: bayan, error } = await db
+        .from("bayans")
+        .select("id, title, content, bayan_date, bayan_categories(name)")
+        .eq("id", bayanId)
+        .single();
+
+      if (error || !bayan) { window.location.href = "bayan-list.html"; return; }
+
+      document.getElementById("bTitle").textContent = bayan.title;
+      document.getElementById("bMeta").textContent =
+        (bayan.bayan_categories ? bayan.bayan_categories.name + " · " : "") + formatDate(bayan.bayan_date);
+      document.getElementById("bContent").textContent = bayan.content || "";
+
+      const { data: media } = await db.from("bayan_media").select("*").eq("bayan_id", bayanId);
+      const container = document.getElementById("mediaContainer");
+      (media || []).forEach((m) => {
+        const div = document.createElement("div");
+        div.className = "media-item";
+        if (m.media_type === "image") {
+          div.innerHTML = `<img src="${escapeHtml(m.file_url)}" alt="" />`;
+        } else if (m.media_type === "video") {
+          div.innerHTML = `<video controls src="${escapeHtml(m.file_url)}"></video>`;
+        } else if (m.media_type === "pdf") {
+          div.innerHTML = `<a class="pdf-link" href="${escapeHtml(m.file_url)}" target="_blank">📄 PDF দেখুন</a>`;
+        } else if (m.media_type === "link") {
+          const isYoutube = /youtu/i.test(m.file_url);
+          const label = isYoutube ? "▶️ ইউটিউবে দেখুন" : "🔗 লিংক দেখুন";
+          div.innerHTML = `<a class="pdf-link" href="${escapeHtml(m.file_url)}" target="_blank">${label}</a>`;
+        }
+        container.appendChild(div);
+      });
+    }
+
+    document.getElementById("deleteBtn").addEventListener("click", async () => {
+      if (!(await showAppConfirm("এই বায়ানটি মুছে ফেলতে চান?", "🗑️"))) return;
+      await db.from("bayans").delete().eq("id", bayanId);
+      window.location.href = "bayan-list.html";
+    });
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      await load();
+    })();
+  </script>
+</body>
+</html>

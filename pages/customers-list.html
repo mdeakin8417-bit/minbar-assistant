@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — কাস্টমার</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>    .cust-card { display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+    .due-amt { font-weight:700; }
+    .due-amt.owes { color: var(--expense); }
+    .due-amt.clear { color: var(--income); }
+    .fab-wrapper {
+      position: fixed; inset: 0; max-width: 480px; margin: 0 auto; pointer-events: none; z-index: 20;
+    }
+    .fab {
+      position: absolute; pointer-events: auto; bottom: 24px; right: 20px;
+      width: 56px; height: 56px; border-radius: 50%; background: var(--gold-600); color: var(--teal-900);
+      border: none; font-size: 28px; box-shadow: var(--shadow-raised);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row" style="gap:10px; margin-bottom:6px;">
+        <button class="back-btn" onclick="window.location.href='finance-list.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+        <h1 style="margin:0;" data-i18n="customersTitle">কাস্টমার / বাকি হিসাব</h1>
+      </div>
+      <p data-i18n="customersSubtitle">কে কত বাকি রেখেছে দেখুন</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div id="custList" class="stack">
+        <p class="muted small text-center">লোড হচ্ছে...</p>
+      </div>
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div style="font-size:36px;">🧾</div>
+        <p data-i18n="noCustomers">এখনো কোনো কাস্টমার যোগ করা হয়নি।</p>
+      </div>
+    </main>
+
+    <div class="fab-wrapper"><button class="fab" onclick="window.location.href='customer-form.html'">+</button></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str || "";
+      return d.innerHTML;
+    }
+    function formatMoney(n) { return "৳" + Number(n || 0).toLocaleString("en-BD"); }
+
+    async function load(institutionId) {
+      const { data: customers, error } = await db
+        .from("customers")
+        .select("id, name, phone")
+        .eq("institution_id", institutionId)
+        .order("name");
+
+      if (error) { showConnectionError("কাস্টমারের তথ্য লোড করা যায়নি।"); return; }
+
+      const { data: txs } = await db
+        .from("customer_transactions")
+        .select("customer_id, type, amount")
+        .eq("institution_id", institutionId);
+
+      const balances = {};
+      (txs || []).forEach((t) => {
+        balances[t.customer_id] = (balances[t.customer_id] || 0) + (t.type === "due" ? Number(t.amount) : -Number(t.amount));
+      });
+
+      const listEl = document.getElementById("custList");
+      const emptyEl = document.getElementById("emptyState");
+      if (!customers || customers.length === 0) {
+        listEl.innerHTML = "";
+        emptyEl.style.display = "block";
+        return;
+      }
+      emptyEl.style.display = "none";
+
+      listEl.innerHTML = customers
+        .map((c) => {
+          const bal = balances[c.id] || 0;
+          const cls = bal > 0 ? "owes" : "clear";
+          const label = bal > 0 ? formatMoney(bal) + " বাকি" : "পরিশোধিত";
+          return `
+          <div class="card cust-card" onclick="window.location.href='customer-detail.html?id=${c.id}'">
+            <div>
+              <h3 style="margin:0 0 2px;">${escapeHtml(c.name)}</h3>
+              <p class="small muted" style="margin:0;">${escapeHtml(c.phone || "")}</p>
+            </div>
+            <div class="due-amt ${cls}">${label}</div>
+          </div>`;
+        })
+        .join("");
+    }
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status === "error") { showConnectionError("প্রতিষ্ঠানের তথ্য লোড করা যায়নি।"); return; }
+      if (inst.status === "empty") { window.location.replace("institution-setup.html"); return; }
+      await load(inst.id);
+    })();
+  </script>
+</body>
+</html>

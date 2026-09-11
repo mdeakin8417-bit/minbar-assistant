@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — সেটিংস</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .settings-row {
+      display:flex; align-items:center; justify-content:space-between; padding: 14px 4px;
+      border-bottom: 1px solid var(--border); cursor:pointer;
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row .left { display:flex; align-items:center; gap:12px; }
+    .settings-row .icon { font-size:20px; }
+    .settings-row .arrow { color: var(--ink-faint); }
+    .avatar-circle {
+      width:56px; height:56px; border-radius:50%; background: var(--gold-600); color: var(--teal-900);
+      display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:700;
+    }
+    .switch { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink:0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch-slider {
+      position: absolute; cursor: pointer; inset: 0; background-color: var(--border-strong);
+      border-radius: 999px; transition: 0.2s;
+    }
+    .switch-slider::before {
+      position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px;
+      background-color: white; border-radius: 50%; transition: 0.2s;
+    }
+    .switch input:checked + .switch-slider { background-color: var(--teal-800); }
+    .switch input:checked + .switch-slider::before { transform: translateX(20px); }
+    .section-title { font-size:12.5px; font-weight:700; color: var(--ink-muted); text-transform:uppercase; letter-spacing:0.4px; margin: 20px 4px 8px; }
+    .section-title:first-of-type { margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header" style="padding-bottom:36px;">
+      <h1 data-i18n="settingsTitle">সেটিংস</h1>
+      <p data-i18n="settingsSubtitle">প্রোফাইল ও অ্যাপ সেটিংস</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="card row" style="gap:14px;">
+        <div style="position:relative; cursor:pointer;" id="avatarWrap">
+          <div class="avatar-circle" id="avatarInitial" style="overflow:hidden; background-size:cover; background-position:center;">?</div>
+          <div style="position:absolute; bottom:-2px; right:-2px; width:22px; height:22px; border-radius:50%; background:var(--teal-800); color:var(--parchment); display:flex; align-items:center; justify-content:center; font-size:11px; border:2px solid var(--surface);">📷</div>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none;" />
+        <div style="flex:1; min-width:0;">
+          <h3 style="margin:0 0 2px;" id="profileName" data-i18n="loading">লোড হচ্ছে...</h3>
+          <p class="small muted" style="margin:0; word-break:break-all;" id="profileEmail"></p>
+        </div>
+      </div>
+
+      <div class="section-title" data-i18n="sectionSecurity">নিরাপত্তা</div>
+      <div class="card">
+        <div class="settings-row" onclick="window.location.href='app-lock-setup.html'">
+          <div class="left"><span class="icon">🔐</span><span data-i18n="appLock">অ্যাপ লক (PIN/প্যাটার্ন/বায়োমেট্রিক)</span></div>
+          <span class="small" id="lockStatus" style="color:var(--ink-faint);"><span data-i18n="lockOff">বন্ধ</span> ›</span>
+        </div>
+        <div class="settings-row" id="notifRow">
+          <div class="left"><span class="icon">🔔</span><span data-i18n="notifRow">দাওয়াতের রিমাইন্ডার নোটিফিকেশন</span></div>
+          <label class="switch">
+            <input type="checkbox" id="notifToggle" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+        <div class="settings-row" onclick="window.location.href='change-password.html'">
+          <div class="left"><span class="icon">🔑</span><span data-i18n="changePassword">পাসওয়ার্ড পরিবর্তন</span></div>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-i18n="sectionGeneral">সাধারণ</div>
+      <div class="card">
+        <div class="settings-row" onclick="window.location.href='prayer-settings.html'">
+          <div class="left"><span class="icon">🕌</span><span data-i18n="prayerTimesRow">নামাজের সময় ও রিমাইন্ডার</span></div>
+          <span class="arrow">›</span>
+        </div>
+        <div class="settings-row" onclick="window.location.href='institution-setup.html'">
+          <div class="left"><span class="icon">🏢</span><span data-i18n="newInstitution">নতুন প্রতিষ্ঠান যোগ করুন</span></div>
+          <span class="arrow">›</span>
+        </div>
+        <div class="settings-row" id="themeRow">
+          <div class="left"><span class="icon">🌓</span><span data-i18n="darkMode">ডার্ক মোড</span></div>
+          <label class="switch">
+            <input type="checkbox" id="themeToggle" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+        <div class="settings-row" onclick="window.location.href='ai-premium.html'">
+          <div class="left"><span class="icon">🤖</span><span data-i18n="aiAssistant">AI সহকারী</span></div>
+          <span class="small" style="color:var(--gold-700); font-weight:700;" data-i18n="premium">✨ প্রিমিয়াম</span>
+        </div>
+        <div class="settings-row" style="cursor:default;">
+          <div class="left"><span class="icon">🌐</span><span data-i18n="language">ভাষা</span></div>
+          <select id="langSelect" style="border:1.5px solid var(--border-strong); border-radius:var(--radius-pill); padding:6px 12px; font-family:var(--font-body); font-size:13px; background:var(--surface); color:var(--ink);">
+            <option value="bn">বাংলা</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title" data-i18n="sectionPrivacy">গোপনীয়তা ও শর্তাবলী</div>
+      <div class="card">
+        <div class="settings-row" onclick="window.location.href='privacy-policy.html'">
+          <div class="left"><span class="icon">📄</span><span data-i18n="privacyPolicy">প্রাইভেসি পলিসি</span></div>
+          <span class="arrow">›</span>
+        </div>
+        <div class="settings-row" onclick="window.location.href='terms.html'">
+          <div class="left"><span class="icon">📜</span><span data-i18n="termsOfService">ব্যবহারের শর্তাবলী</span></div>
+          <span class="arrow">›</span>
+        </div>
+        <div class="settings-row" id="deleteAccountRow" style="color: var(--expense);">
+          <div class="left"><span class="icon">🗑️</span><span data-i18n="deleteAccount">অ্যাকাউন্ট মুছে ফেলার অনুরোধ</span></div>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="section-title" data-i18n="sectionAbout">অ্যাপ সম্পর্কে</div>
+      <div class="card">
+        <div class="settings-row" style="cursor:default;">
+          <div class="left"><span class="icon">ℹ️</span><span data-i18n="version">ভার্সন</span></div>
+          <span class="small muted">1.0.0</span>
+        </div>
+        <div class="settings-row" id="helpRow" onclick="window.location.href='feedback.html'">
+          <div class="left"><span class="icon">💬</span><span data-i18n="feedbackRow">মতামত/অভিযোগ পাঠান</span></div>
+          <span class="arrow">›</span>
+        </div>
+        <div class="settings-row" id="adminRow" style="display:none;" onclick="window.location.href='admin.html'">
+          <div class="left"><span class="icon">🛠️</span><span>এডমিন প্যানেল</span></div>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="settings-row" id="logoutRow" style="color: var(--expense);">
+          <div class="left"><span class="icon">🚪</span><span data-i18n="logout">লগআউট</span></div>
+        </div>
+      </div>
+
+      <p class="small text-center muted mt-6" data-i18n="freeTagline">Minbar Assistant · সম্পূর্ণ ফ্রি</p>
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span data-i18n="navHome">হোম</span>
+      </a>
+      <a href="bayan-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span data-i18n="navBayan">বায়ান</span>
+      </a>
+      <a href="dawat-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span data-i18n="navDawat">দাওয়াত</span>
+      </a>
+      <a href="finance-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span data-i18n="navFinance">হিসাব</span>
+      </a>
+      <a href="settings.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="navSettings">সেটিংস</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+
+    const langSelect = document.getElementById("langSelect");
+    langSelect.value = getLang();
+    langSelect.addEventListener("change", () => {
+      setLang(langSelect.value);
+      applyTranslations();
+    });
+    document.getElementById("logoutRow").addEventListener("click", async () => {
+      if (await showAppConfirm("আপনি কি লগআউট করতে চান?", "🚪")) await signOutAndRedirect();
+    });
+
+    if (localStorage.getItem("minbar_lock_enabled") === "1") {
+      document.getElementById("lockStatus").innerHTML = "✅ " + t("lockOn") + " ›";
+    }
+
+    document.getElementById("deleteAccountRow").addEventListener("click", async () => {
+      await showAppAlert(
+        "অ্যাকাউন্ট ও এর সাথে যুক্ত সব তথ্য (বায়ান, দাওয়াত, হিসাব) স্থায়ীভাবে মুছে ফেলার জন্য আপনার নিবন্ধিত ইমেইল থেকে অনুরোধ পাঠান। যাচাই করে যুক্তিসঙ্গত সময়ের মধ্যে মুছে ফেলা হবে।",
+        "🗑️"
+      );
+    });
+
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.checked = localStorage.getItem("minbar_theme") === "dark";
+    themeToggle.addEventListener("change", () => {
+      if (themeToggle.checked) {
+        localStorage.setItem("minbar_theme", "dark");
+        document.documentElement.setAttribute("data-theme", "dark");
+      } else {
+        localStorage.setItem("minbar_theme", "light");
+        document.documentElement.removeAttribute("data-theme");
+      }
+    });
+
+    const notifToggle = document.getElementById("notifToggle");
+    (async () => {
+      notifToggle.checked = await isPushSubscribed();
+    })();
+    notifToggle.addEventListener("change", async () => {
+      if (notifToggle.checked) {
+        notifToggle.disabled = true;
+        const result = await subscribeToPushNotifications();
+        notifToggle.disabled = false;
+        if (result.status === "denied") {
+          notifToggle.checked = false;
+          await showAppAlert(
+            "নোটিফিকেশনের অনুমতি ব্লক করা আছে। ঠিকানা বারের বাম পাশে 🔒 আইকনে ট্যাপ করুন → Permissions → Notifications → Allow করে দিন, তারপর আবার চেষ্টা করুন।",
+            "🔔"
+          );
+        } else if (result.status === "unsupported") {
+          notifToggle.checked = false;
+          await showAppAlert("এই ব্রাউজারে পুশ নোটিফিকেশন সাপোর্ট করে না।", "⚠️");
+        } else if (result.status === "error") {
+          notifToggle.checked = false;
+          await showAppAlert("চালু করা যায়নি: " + (result.message || ""), "⚠️");
+        } else {
+          await showAppAlert("নোটিফিকেশন চালু হয়ে গেছে! এখন থেকে দাওয়াতের রিমাইন্ডার পাবেন।", "✅");
+        }
+      } else {
+        await unsubscribeFromPushNotifications();
+      }
+    });
+
+    document.getElementById("avatarWrap").addEventListener("click", () => {
+      document.getElementById("avatarInput").click();
+    });
+
+    document.getElementById("avatarInput").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      const ext = file.name.split(".").pop();
+      const path = user.id + "/avatar." + ext;
+
+      const avatarEl = document.getElementById("avatarInitial");
+      const originalText = avatarEl.textContent;
+      avatarEl.textContent = "…";
+
+      const { error: uploadError } = await db.storage.from("avatars").upload(path, file, { upsert: true });
+      if (uploadError) {
+        avatarEl.textContent = originalText;
+        await showAppAlert("ছবি আপলোড করা যায়নি: " + uploadError.message, "⚠️");
+        return;
+      }
+
+      const { data: publicUrlData } = db.storage.from("avatars").getPublicUrl(path);
+      const publicUrl = publicUrlData.publicUrl + "?t=" + Date.now();
+
+      await db.from("profiles").update({ avatar_url: publicUrl }).eq("id", user.id);
+
+      avatarEl.style.backgroundImage = "url('" + publicUrl + "')";
+      avatarEl.textContent = "";
+    });
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const name = (user.user_metadata && user.user_metadata.full_name) || user.email;
+      document.getElementById("profileName").textContent = name;
+      document.getElementById("profileEmail").textContent = user.email;
+
+      const avatarEl = document.getElementById("avatarInitial");
+      const { data: profile } = await db.from("profiles").select("avatar_url").eq("id", user.id).maybeSingle();
+      if (profile && profile.avatar_url) {
+        avatarEl.style.backgroundImage = "url('" + profile.avatar_url + "')";
+        avatarEl.textContent = "";
+      } else {
+        avatarEl.textContent = name.trim().charAt(0).toUpperCase();
+      }
+
+      if (user.id === "8581fa4f-c7d7-4b02-a63e-c9c2b8a6eabb") {
+        document.getElementById("adminRow").style.display = "flex";
+      }
+    })();
+  </script>
+</body>
+</html>
