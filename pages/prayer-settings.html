@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — নামাজের সময়</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .back-btn-wrap { display:flex; gap:10px; align-items:center; margin-bottom:6px; }
+    .loc-box {
+      display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius: var(--radius-md);
+      background: var(--surface-sunken); margin-bottom: var(--space-4);
+    }
+    .prayer-row { display:grid; grid-template-columns: 80px 1fr; gap:10px; align-items:center; margin-bottom:10px; }
+    .prayer-row label { font-weight:600; font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row back-btn-wrap">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <h1 style="margin:0;" data-i18n="prayerTitle">নামাজের সময়</h1>
+      </div>
+      <p data-i18n="prayerSubtitle">জামাতের সময় ও রিমাইন্ডার সেট করুন</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="card" style="box-shadow: var(--shadow-raised);">
+        <div id="alertBox" class="alert"></div>
+
+        <h3 style="margin-bottom:6px; font-size:15px;">📍 <span data-i18n="location">মসজিদের অবস্থান</span></h3>
+        <div class="loc-box">
+          <span style="font-size:20px;">🗺️</span>
+          <div style="flex:1;">
+            <div class="small" id="locStatus" style="font-weight:600;">অবস্থান সেট করা নেই</div>
+            <div class="small muted">অটো আজানের সময় দেখানোর জন্য প্রয়োজন</div>
+          </div>
+          <button type="button" class="btn btn--ghost" id="locBtn" style="width:auto; padding:8px 14px; font-size:13px;">সেট করুন</button>
+        </div>
+
+        <h3 style="margin-bottom:10px; font-size:15px;">🕌 জামাতের সময় (ঐচ্ছিক)</h3>
+        <p class="small muted" style="margin-top:-6px;">যে ওয়াক্তের সময় দেবেন, শুধু সেটার জন্যই রিমাইন্ডার কাজ করবে</p>
+
+        <div class="prayer-row"><label data-i18n="fajr">ফজর</label><input type="time" id="fajr" /></div>
+        <div class="prayer-row"><label data-i18n="zuhr">যোহর</label><input type="time" id="zuhr" /></div>
+        <div class="prayer-row"><label data-i18n="asr">আসর</label><input type="time" id="asr" /></div>
+        <div class="prayer-row"><label data-i18n="maghrib">মাগরিব</label><input type="time" id="maghrib" /></div>
+        <div class="prayer-row"><label data-i18n="isha">ইশা</label><input type="time" id="isha" /></div>
+        <div class="prayer-row"><label data-i18n="jumma">জুমা</label><input type="time" id="jumma" /></div>
+
+        <h3 style="margin: var(--space-4) 0 10px; font-size:15px;">🔔 রিমাইন্ডার</h3>
+        <div class="field">
+          <label for="reminderMinutes">কত মিনিট আগে মনে করিয়ে দেবে</label>
+          <select id="reminderMinutes">
+            <option value="5">৫ মিনিট আগে</option>
+            <option value="10" selected>১০ মিনিট আগে</option>
+            <option value="15">১৫ মিনিট আগে</option>
+            <option value="20">২০ মিনিট আগে</option>
+          </select>
+        </div>
+        <div class="settings-row" style="padding:10px 0;">
+          <div class="left"><span>রিমাইন্ডার নোটিফিকেশন চালু করুন</span></div>
+          <label class="switch">
+            <input type="checkbox" id="reminderEnabled" />
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
+        <button type="button" class="btn btn--primary mt-6" id="saveBtn">
+          <span class="btn-label" data-i18n="save">সংরক্ষণ করুন</span>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let institutionId = null;
+    const alertBox = document.getElementById("alertBox");
+    function showAlert(m, t) { alertBox.textContent = m; alertBox.className = "alert show alert--" + t; }
+
+    document.getElementById("locBtn").addEventListener("click", () => {
+      if (!navigator.geolocation) { showAlert("এই ব্রাউজারে লোকেশন সাপোর্ট নেই।", "error"); return; }
+      document.getElementById("locStatus").textContent = "লোকেশন খোঁজা হচ্ছে...";
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          await db.from("institutions").update({ latitude, longitude }).eq("id", institutionId);
+          document.getElementById("locStatus").textContent = "✅ অবস্থান সেট হয়েছে";
+          showAlert("অবস্থান সংরক্ষণ হয়েছে।", "success");
+        },
+        () => {
+          document.getElementById("locStatus").textContent = "অবস্থান পাওয়া যায়নি";
+          showAlert("লোকেশনের অনুমতি দিন এবং আবার চেষ্টা করুন।", "error");
+        }
+      );
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("saveBtn");
+      btn.disabled = true;
+      btn.querySelector(".btn-label").textContent = "সংরক্ষণ হচ্ছে...";
+
+      const payload = {
+        institution_id: institutionId,
+        fajr_time: document.getElementById("fajr").value || null,
+        zuhr_time: document.getElementById("zuhr").value || null,
+        asr_time: document.getElementById("asr").value || null,
+        maghrib_time: document.getElementById("maghrib").value || null,
+        isha_time: document.getElementById("isha").value || null,
+        jumma_time: document.getElementById("jumma").value || null,
+        reminder_minutes_before: parseInt(document.getElementById("reminderMinutes").value, 10),
+        reminder_enabled: document.getElementById("reminderEnabled").checked,
+      };
+
+      const { error } = await db.from("prayer_settings").upsert(payload, { onConflict: "institution_id" });
+
+      btn.disabled = false;
+      btn.querySelector(".btn-label").textContent = "সংরক্ষণ করুন";
+
+      if (error) { showAlert("সংরক্ষণ করা যায়নি: " + error.message, "error"); return; }
+      showAlert("নামাজের সময় সংরক্ষণ হয়েছে!", "success");
+    });
+
+    async function loadExisting() {
+      const { data: inst } = await db.from("institutions").select("latitude, longitude").eq("id", institutionId).single();
+      if (inst && inst.latitude) document.getElementById("locStatus").textContent = "✅ অবস্থান সেট হয়েছে";
+
+      const { data } = await db.from("prayer_settings").select("*").eq("institution_id", institutionId).maybeSingle();
+      if (data) {
+        if (data.fajr_time) document.getElementById("fajr").value = data.fajr_time.slice(0, 5);
+        if (data.zuhr_time) document.getElementById("zuhr").value = data.zuhr_time.slice(0, 5);
+        if (data.asr_time) document.getElementById("asr").value = data.asr_time.slice(0, 5);
+        if (data.maghrib_time) document.getElementById("maghrib").value = data.maghrib_time.slice(0, 5);
+        if (data.isha_time) document.getElementById("isha").value = data.isha_time.slice(0, 5);
+        if (data.jumma_time) document.getElementById("jumma").value = data.jumma_time.slice(0, 5);
+        document.getElementById("reminderMinutes").value = data.reminder_minutes_before;
+        document.getElementById("reminderEnabled").checked = data.reminder_enabled;
+      }
+    }
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status === "error") { showConnectionError("তথ্য লোড করা যায়নি।"); return; }
+      if (inst.status === "empty") { window.location.replace("institution-setup.html"); return; }
+      institutionId = inst.id;
+      await loadExisting();
+    })();
+  </script>
+</body>
+</html>

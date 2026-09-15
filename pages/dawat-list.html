@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — দাওয়াত</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: var(--space-4); scrollbar-width: none; }
+    .chip-row::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: 0 0 auto; padding: 7px 16px; border-radius: var(--radius-pill);
+      background: var(--surface); border: 1.5px solid var(--border-strong);
+      font-size: 13.5px; font-weight: 600; color: var(--ink-muted); white-space: nowrap; cursor: pointer;
+    }
+    .chip.active { background: var(--teal-800); border-color: var(--teal-800); color: var(--parchment); }
+
+    .dawat-card { cursor: pointer; }
+    .status-badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: var(--radius-pill); display:inline-block; }
+    .status-upcoming { background: rgba(201,152,46,0.15); color: var(--gold-700); }
+    .status-completed { background: var(--income-bg); color: var(--income); }
+    .status-cancelled { background: var(--expense-bg); color: var(--expense); }
+    .dawat-card h3 { font-size: 16.5px; margin: 4px 0 2px; }
+
+    .fab-wrapper {
+      position: fixed; inset: 0; max-width: 480px; margin: 0 auto; pointer-events: none; z-index: 20;
+    }
+    .fab {
+      position: absolute; pointer-events: auto; bottom: 88px; right: 20px;
+      width: 56px; height: 56px; border-radius: 50%; background: var(--gold-600); color: var(--teal-900);
+      border: none; font-size: 28px; box-shadow: var(--shadow-raised);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header" style="padding-bottom:36px;">
+      <h1 data-i18n="dawatTitle">দাওয়াত</h1>
+      <p data-i18n="dawatSubtitle">মুসল্লিদের বাসার দাওয়াতের তালিকা</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="chip-row">
+        <div class="chip active" data-status="upcoming" data-i18n="statusUpcoming">উপক্রমিক</div>
+        <div class="chip" data-status="completed" data-i18n="statusCompleted">সম্পন্ন</div>
+        <div class="chip" data-status="cancelled" data-i18n="statusCancelled">বাতিল</div>
+        <div class="chip" data-status="all" data-i18n="all">সব</div>
+      </div>
+
+      <div id="dawatList" class="stack">
+        <p class="muted small text-center">লোড হচ্ছে...</p>
+      </div>
+
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div style="font-size:36px;">🍽️</div>
+        <p data-i18n="noDawat">এই তালিকায় কোনো দাওয়াত নেই।</p>
+      </div>
+    </main>
+
+    <div class="fab-wrapper"><button class="fab" onclick="window.location.href='dawat-form.html'">+</button></div>
+
+    <nav class="bottom-nav">
+      <a href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span data-i18n="navHome">হোম</span>
+      </a>
+      <a href="bayan-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span data-i18n="navBayan">বায়ান</span>
+      </a>
+      <a href="dawat-list.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span data-i18n="navDawat">দাওয়াত</span>
+      </a>
+      <a href="finance-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span data-i18n="navFinance">হিসাব</span>
+      </a>
+      <a href="settings.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="navSettings">সেটিংস</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let allDawats = [];
+    let activeStatus = "upcoming";
+    let institutionId = null;
+
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str || "";
+      return d.innerHTML;
+    }
+
+    function formatDateTime(dtStr) {
+      if (!dtStr) return "";
+      const d = new Date(dtStr);
+      const months = ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
+      let h = d.getHours();
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      const m = String(d.getMinutes()).padStart(2, "0");
+      return d.getDate() + " " + months[d.getMonth()] + ", " + h + ":" + m + " " + ampm;
+    }
+
+    const statusLabels = { upcoming: t("statusUpcoming"), completed: t("statusCompleted"), cancelled: t("statusCancelled") };
+
+    function renderList() {
+      const listEl = document.getElementById("dawatList");
+      const emptyEl = document.getElementById("emptyState");
+      let filtered = activeStatus === "all" ? allDawats : allDawats.filter((d) => d.status === activeStatus);
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = "";
+        emptyEl.style.display = "block";
+        return;
+      }
+      emptyEl.style.display = "none";
+
+      listEl.innerHTML = filtered
+        .map(
+          (d) => `
+        <div class="card dawat-card" onclick="window.location.href='dawat-detail.html?id=${d.id}'">
+          <span class="status-badge status-${d.status}">${statusLabels[d.status]}</span>
+          <h3>${escapeHtml(d.host_name)}</h3>
+          <p class="small muted" style="margin:0;">🕐 ${escapeHtml(formatDateTime(d.dawat_datetime))}</p>
+          ${d.address ? `<p class="small muted" style="margin:2px 0 0;">📍 ${escapeHtml(d.address)}</p>` : ""}
+        </div>`
+        )
+        .join("");
+    }
+
+    document.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        activeStatus = chip.dataset.status;
+        renderList();
+      });
+    });
+
+    async function loadDawats() {
+      const { data, error } = await db
+        .from("dawats")
+        .select("id, host_name, address, dawat_datetime, status")
+        .eq("institution_id", institutionId)
+        .order("dawat_datetime", { ascending: true });
+
+      if (error) {
+        document.getElementById("emptyState").style.display = "block";
+        return;
+      }
+      allDawats = data || [];
+      renderList();
+    }
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status === "error") { showConnectionError("প্রতিষ্ঠানের তথ্য লোড করা যায়নি।"); return; }
+      if (inst.status === "empty") { window.location.replace("institution-setup.html"); return; }
+      institutionId = inst.id;
+      await loadDawats();
+    })();
+  </script>
+</body>
+</html>

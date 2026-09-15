@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — লেনদেন বিস্তারিত</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>    .icon-btn { background: rgba(250,246,239,0.12); border:none; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--parchment); }
+    .info-row { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .info-row:last-child { border-bottom:none; }
+    .big-amt { font-size: 32px; font-weight: 700; text-align:center; margin: 8px 0; }
+    .big-amt.income { color: var(--income); }
+    .big-amt.expense { color: var(--expense); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row-between">
+        <button class="back-btn" onclick="window.location.href='finance-list.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+        <button class="icon-btn" id="deleteBtn" title="মুছুন">🗑️</button>
+      </div>
+      <h1 id="tTitle" style="margin-top:8px;">লোড হচ্ছে...</h1>
+    </header>
+
+    <main class="screen" style="margin-top:-20px;">
+      <div class="card">
+        <div class="big-amt" id="tAmount">৳০</div>
+        <div class="info-row"><span>📁</span><span id="tCategory" class="muted">—</span></div>
+        <div class="info-row"><span>📅</span><span id="tDate" class="muted">—</span></div>
+        <div class="info-row"><span>📝</span><span id="tDesc" class="muted">—</span></div>
+      </div>
+      <div id="attachmentBox" style="display:none; margin-top:16px;">
+        <a id="attachmentLink" href="#" target="_blank" class="btn btn--secondary" style="text-decoration:none;">📎 রসিদ/বিল দেখুন</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    const params = new URLSearchParams(window.location.search);
+    const txId = params.get("id");
+
+    function formatMoney(n) { return "৳" + Number(n || 0).toLocaleString("en-BD"); }
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      const months = ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
+      return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
+    }
+
+    async function load() {
+      if (!txId) { window.location.href = "finance-list.html"; return; }
+      const { data: t, error } = await db
+        .from("transactions")
+        .select("*, finance_categories(name)")
+        .eq("id", txId)
+        .single();
+      if (error || !t) { window.location.href = "finance-list.html"; return; }
+
+      document.getElementById("tTitle").textContent = t.description || (t.type === "income" ? "আয়" : "ব্যয়");
+      const amtEl = document.getElementById("tAmount");
+      amtEl.textContent = (t.type === "income" ? "+" : "-") + formatMoney(t.amount);
+      amtEl.className = "big-amt " + t.type;
+      document.getElementById("tCategory").textContent = t.finance_categories ? t.finance_categories.name : "সাধারণ";
+      document.getElementById("tDate").textContent = formatDate(t.transaction_date);
+      document.getElementById("tDesc").textContent = t.description || "কোনো বিবরণ নেই";
+
+      if (t.attachment_url) {
+        const { data: signed } = await db.storage.from("finance-attachments").createSignedUrl(t.attachment_url, 3600);
+        if (signed) {
+          document.getElementById("attachmentLink").href = signed.signedUrl;
+          document.getElementById("attachmentBox").style.display = "block";
+        }
+      }
+    }
+
+    document.getElementById("deleteBtn").addEventListener("click", async () => {
+      if (!(await showAppConfirm("এই লেনদেনটি মুছে ফেলতে চান?", "🗑️"))) return;
+      await db.from("transactions").delete().eq("id", txId);
+      window.location.href = "finance-list.html";
+    });
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      await load();
+    })();
+  </script>
+</body>
+</html>

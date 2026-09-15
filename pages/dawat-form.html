@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — নতুন দাওয়াত</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row" style="gap:10px; margin-bottom:6px;">
+        <button class="back-btn" onclick="window.location.href='dawat-list.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+        <h1 style="margin:0;" data-i18n="newDawatTitle">নতুন দাওয়াত</h1>
+      </div>
+      <p>কে দাওয়াত দিয়েছেন, কখন ও কোথায়</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="card" style="box-shadow: var(--shadow-raised);">
+        <div id="alertBox" class="alert"></div>
+
+        <form id="dawatForm" class="stack">
+          <div class="field" id="hostField">
+            <label for="hostName" data-i18n="hostName">দাওয়াতদাতার নাম</label>
+            <input type="text" id="hostName" placeholder="যেমন: করিম উদ্দিন" required />
+            <div class="field-error">নাম লিখুন</div>
+          </div>
+
+          <div class="field">
+            <label for="hostPhone">মোবাইল নম্বর (ঐচ্ছিক)</label>
+            <input type="tel" id="hostPhone" placeholder="01XXXXXXXXX" />
+          </div>
+
+          <div class="field">
+            <label for="address">ঠিকানা (ঐচ্ছিক)</label>
+            <input type="text" id="address" placeholder="বাসার ঠিকানা / এলাকা" />
+          </div>
+
+          <div class="field" id="dateField">
+            <label for="dawatDate" data-i18n="dateTime">তারিখ ও সময়</label>
+            <input type="datetime-local" id="dawatDate" required />
+            <div class="field-error">তারিখ ও সময় দিন</div>
+          </div>
+
+          <div class="field">
+            <label for="reminderBefore" data-i18n="reminder">রিমাইন্ডার</label>
+            <select id="reminderBefore">
+              <option value="30">৩০ মিনিট আগে</option>
+              <option value="60" selected>১ ঘণ্টা আগে</option>
+              <option value="120">২ ঘণ্টা আগে</option>
+              <option value="1440">১ দিন আগে</option>
+              <option value="0">রিমাইন্ডার লাগবে না</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="note" data-i18n="note">নোট (ঐচ্ছিক)</label>
+            <textarea id="note" rows="3" placeholder="বিশেষ কিছু মনে রাখার থাকলে লিখুন..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn--primary" id="saveBtn">
+            <span class="btn-label" data-i18n="save">সংরক্ষণ করুন</span>
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let institutionId = null;
+    let currentUser = null;
+
+    const alertBox = document.getElementById("alertBox");
+    function showAlert(message, type) {
+      alertBox.textContent = message;
+      alertBox.className = "alert show alert--" + type;
+    }
+
+    document.getElementById("dawatForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const hostName = document.getElementById("hostName").value.trim();
+      const hostField = document.getElementById("hostField");
+      const dawatDate = document.getElementById("dawatDate").value;
+      const dateField = document.getElementById("dateField");
+
+      let hasError = false;
+      if (!hostName) { hostField.classList.add("has-error"); hasError = true; } else hostField.classList.remove("has-error");
+      if (!dawatDate) { dateField.classList.add("has-error"); hasError = true; } else dateField.classList.remove("has-error");
+      if (hasError) return;
+
+      const btn = document.getElementById("saveBtn");
+      btn.disabled = true;
+      btn.querySelector(".btn-label").textContent = "সংরক্ষণ হচ্ছে...";
+
+      const { error } = await db.from("dawats").insert({
+        institution_id: institutionId,
+        host_name: hostName,
+        host_phone: document.getElementById("hostPhone").value.trim() || null,
+        address: document.getElementById("address").value.trim() || null,
+        dawat_datetime: new Date(dawatDate).toISOString(),
+        reminder_minutes_before: parseInt(document.getElementById("reminderBefore").value, 10),
+        note: document.getElementById("note").value.trim() || null,
+        created_by: currentUser.id,
+      });
+
+      if (error) {
+        btn.disabled = false;
+        btn.querySelector(".btn-label").textContent = "সংরক্ষণ করুন";
+        showAlert("সংরক্ষণ করা যায়নি: " + error.message, "error");
+        return;
+      }
+      window.location.href = "dawat-list.html";
+    });
+
+    (async () => {
+      currentUser = await getCurrentUser();
+      if (!currentUser) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status === "error") { showConnectionError("প্রতিষ্ঠানের তথ্য লোড করা যায়নি।"); return; }
+      if (inst.status === "empty") { window.location.replace("institution-setup.html"); return; }
+      institutionId = inst.id;
+    })();
+  </script>
+</body>
+</html>

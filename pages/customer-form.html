@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — নতুন কাস্টমার</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row" style="gap:10px; margin-bottom:6px;">
+        <button class="back-btn" onclick="window.location.href='customers-list.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+        <h1 style="margin:0;" data-i18n="newCustomer">নতুন কাস্টমার</h1>
+      </div>
+      <p data-i18n="customerDetails">কাস্টমারের তথ্য দিন</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="card" style="box-shadow: var(--shadow-raised);">
+        <div id="alertBox" class="alert"></div>
+        <form id="custForm" class="stack">
+          <div class="field" id="nameField">
+            <label for="custName" data-i18n="name">নাম</label>
+            <input type="text" id="custName" placeholder="কাস্টমারের নাম" required />
+            <div class="field-error">নাম লিখুন</div>
+          </div>
+          <div class="field">
+            <label for="custPhone" data-i18n="phone">মোবাইল নম্বর (ঐচ্ছিক)</label>
+            <input type="tel" id="custPhone" placeholder="01XXXXXXXXX" />
+          </div>
+          <div class="field">
+            <label for="custAddress" data-i18n="address">ঠিকানা (ঐচ্ছিক)</label>
+            <input type="text" id="custAddress" placeholder="এলাকা / ঠিকানা" />
+          </div>
+          <button type="submit" class="btn btn--primary" id="saveBtn">
+            <span class="btn-label" data-i18n="save">সংরক্ষণ করুন</span>
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let institutionId = null;
+    const alertBox = document.getElementById("alertBox");
+    function showAlert(m, t) { alertBox.textContent = m; alertBox.className = "alert show alert--" + t; }
+
+    document.getElementById("custForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("custName").value.trim();
+      const nameField = document.getElementById("nameField");
+      if (!name) { nameField.classList.add("has-error"); return; }
+      nameField.classList.remove("has-error");
+
+      const btn = document.getElementById("saveBtn");
+      btn.disabled = true;
+      btn.querySelector(".btn-label").textContent = "সংরক্ষণ হচ্ছে...";
+
+      const { error } = await db.from("customers").insert({
+        institution_id: institutionId,
+        name,
+        phone: document.getElementById("custPhone").value.trim() || null,
+        address: document.getElementById("custAddress").value.trim() || null,
+      });
+
+      if (error) {
+        btn.disabled = false;
+        btn.querySelector(".btn-label").textContent = "সংরক্ষণ করুন";
+        showAlert("সংরক্ষণ করা যায়নি: " + error.message, "error");
+        return;
+      }
+      window.location.href = "customers-list.html";
+    });
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status === "error") { showConnectionError("প্রতিষ্ঠানের তথ্য লোড করা যায়নি।"); return; }
+      if (inst.status === "empty") { window.location.replace("institution-setup.html"); return; }
+      institutionId = inst.id;
+    })();
+  </script>
+</body>
+</html>
