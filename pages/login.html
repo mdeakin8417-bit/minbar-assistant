@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — প্রবেশ করুন</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <svg class="arch-header__pattern" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="star8" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M20 4 L24 16 L36 16 L26 23 L30 36 L20 28 L10 36 L14 23 L4 16 L16 16 Z"
+                  fill="none" stroke="#FAF6EF" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect width="400" height="200" fill="url(#star8)" />
+      </svg>
+      <div class="row" style="gap:12px; margin-bottom: 14px;">
+        <img src="../icons/icon-192.png" alt="" width="44" height="44" style="border-radius:12px;" />
+        <div>
+          <div style="font-weight:700; font-size:15px; letter-spacing:0.2px;">মিনবার অ্যাসিস্ট্যান্ট</div>
+        </div>
+      </div>
+      <h1 data-i18n="loginTitle">আসসালামু আলাইকুম</h1>
+      <p data-i18n="loginSubtitle">বায়ান, দাওয়াত ও হিসাব — সব একসাথে, এক জায়গায়।</p>
+    </header>
+
+    <main class="screen" style="margin-top: -28px;">
+      <div class="card" style="box-shadow: var(--shadow-raised);">
+        <div class="tabs">
+          <button type="button" id="tabLogin" class="active" data-i18n="loginTab">লগইন</button>
+          <button type="button" id="tabSignup" data-i18n="signupTab">নতুন অ্যাকাউন্ট</button>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <!-- লগইন ফর্ম -->
+        <form id="loginForm" class="stack">
+          <div class="field" id="loginEmailField">
+            <label for="loginEmail" data-i18n="email">ইমেইল</label>
+            <input type="email" id="loginEmail" placeholder="আপনার ইমেইল লিখুন" autocomplete="email" required />
+            <div class="field-error">সঠিক ইমেইল দিন</div>
+          </div>
+          <div class="field" id="loginPasswordField">
+            <label for="loginPassword" data-i18n="password">পাসওয়ার্ড</label>
+            <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড লিখুন" autocomplete="current-password" required />
+            <div class="field-error">পাসওয়ার্ড দিন</div>
+          </div>
+          <button type="submit" class="btn btn--primary" id="loginBtn">
+            <span class="btn-label" data-i18n="loginBtn">প্রবেশ করুন</span>
+          </button>
+          <button type="button" class="btn btn--text" id="forgotBtn" style="align-self:center;" data-i18n="forgotPassword">পাসওয়ার্ড ভুলে গেছেন?</button>
+        </form>
+
+        <!-- সাইনআপ ফর্ম -->
+        <form id="signupForm" class="stack" style="display:none;">
+          <div class="field" id="signupNameField">
+            <label for="signupName" data-i18n="fullName">পূর্ণ নাম</label>
+            <input type="text" id="signupName" placeholder="যেমন: মাওঃ মোঃ ওয়াহিদুল ইসলাম ইয়াকিন" autocomplete="name" required />
+            <div class="field-error">নাম লিখুন</div>
+          </div>
+          <div class="field" id="signupEmailField">
+            <label for="signupEmail" data-i18n="email">ইমেইল</label>
+            <input type="email" id="signupEmail" placeholder="আপনার ইমেইল লিখুন" autocomplete="email" required />
+            <div class="field-error">সঠিক ইমেইল দিন</div>
+          </div>
+          <div class="field" id="signupPasswordField">
+            <label for="signupPassword" data-i18n="password">পাসওয়ার্ড</label>
+            <input type="password" id="signupPassword" placeholder="কমপক্ষে ৬ ক্যারেক্টার" autocomplete="new-password" required minlength="6" />
+            <div class="field-hint">অন্তত ৬টি অক্ষর/সংখ্যা দিয়ে একটি নিরাপদ পাসওয়ার্ড দিন</div>
+            <div class="field-error">পাসওয়ার্ড কমপক্ষে ৬ ক্যারেক্টার হতে হবে</div>
+          </div>
+          <button type="submit" class="btn btn--primary" id="signupBtn">
+            <span class="btn-label" data-i18n="signupBtn">অ্যাকাউন্ট তৈরি করুন</span>
+          </button>
+        </form>
+      </div>
+
+      <p class="small text-center muted mt-6" data-i18n="privacyNote">
+        অ্যাকাউন্ট শুধুই আপনার — আপনার কোনো তথ্য অন্য কেউ দেখতে পারবে না।
+      </p>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    const tabLogin = document.getElementById("tabLogin");
+    const tabSignup = document.getElementById("tabSignup");
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const alertBox = document.getElementById("alertBox");
+
+    function showAlert(message, type) {
+      alertBox.textContent = message;
+      alertBox.className = "alert show alert--" + type;
+    }
+    function hideAlert() {
+      alertBox.className = "alert";
+    }
+
+    tabLogin.addEventListener("click", () => {
+      tabLogin.classList.add("active");
+      tabSignup.classList.remove("active");
+      loginForm.style.display = "flex";
+      signupForm.style.display = "none";
+      hideAlert();
+    });
+    tabSignup.addEventListener("click", () => {
+      tabSignup.classList.add("active");
+      tabLogin.classList.remove("active");
+      signupForm.style.display = "flex";
+      loginForm.style.display = "none";
+      hideAlert();
+    });
+
+    function setLoading(button, loading, labelWhileLoading) {
+      const label = button.querySelector(".btn-label");
+      if (loading) {
+        button.disabled = true;
+        button.dataset.originalLabel = label.textContent;
+        label.textContent = labelWhileLoading;
+      } else {
+        button.disabled = false;
+        label.textContent = button.dataset.originalLabel;
+      }
+    }
+
+    function markFieldError(fieldEl, hasError) {
+      fieldEl.classList.toggle("has-error", hasError);
+    }
+
+    // ---------- লগইন ----------
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideAlert();
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      const emailField = document.getElementById("loginEmailField");
+      const passField = document.getElementById("loginPasswordField");
+      markFieldError(emailField, !email);
+      markFieldError(passField, !password);
+      if (!email || !password) return;
+
+      const btn = document.getElementById("loginBtn");
+      setLoading(btn, true, "প্রবেশ করা হচ্ছে...");
+
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+      setLoading(btn, false);
+
+      if (error) {
+        showAlert("লগইন ব্যর্থ হয়েছে: ইমেইল বা পাসওয়ার্ড সঠিক নয়।", "error");
+        return;
+      }
+      window.location.href = "dashboard.html";
+    });
+
+    // ---------- সাইনআপ ----------
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideAlert();
+      const name = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value;
+
+      const nameField = document.getElementById("signupNameField");
+      const emailField = document.getElementById("signupEmailField");
+      const passField = document.getElementById("signupPasswordField");
+      markFieldError(nameField, !name);
+      markFieldError(emailField, !email);
+      markFieldError(passField, password.length < 6);
+      if (!name || !email || password.length < 6) return;
+
+      const btn = document.getElementById("signupBtn");
+      setLoading(btn, true, "তৈরি হচ্ছে...");
+
+      const { data, error } = await db.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } },
+      });
+
+      setLoading(btn, false);
+
+      if (error) {
+        if (error.message.includes("already registered") || error.message.includes("already exists")) {
+          showAlert("এই ইমেইল দিয়ে আগে থেকেই অ্যাকাউন্ট আছে — লগইন করুন।", "error");
+        } else {
+          showAlert("অ্যাকাউন্ট তৈরি করা যায়নি: " + error.message, "error");
+        }
+        return;
+      }
+
+      if (data.session) {
+        // ইমেইল কনফার্মেশন ছাড়াই সাথে সাথে সেশন পাওয়া গেলে
+        window.location.href = "dashboard.html";
+      } else {
+        showAlert("অ্যাকাউন্ট তৈরি হয়েছে! আপনার ইমেইলে পাঠানো লিংকে ক্লিক করে যাচাই করুন, তারপর লগইন করুন।", "success");
+        tabLogin.click();
+      }
+    });
+
+    // ---------- পাসওয়ার্ড রিসেট ----------
+    document.getElementById("forgotBtn").addEventListener("click", async () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      if (!email) {
+        showAlert("প্রথমে ইমেইল বক্সে আপনার ইমেইল লিখুন, তারপর এই বাটনে চাপুন।", "error");
+        return;
+      }
+      const { error } = await db.auth.resetPasswordForEmail(email);
+      if (error) {
+        showAlert("রিসেট লিংক পাঠানো যায়নি: " + error.message, "error");
+      } else {
+        showAlert("পাসওয়ার্ড রিসেটের লিংক আপনার ইমেইলে পাঠানো হয়েছে।", "success");
+      }
+    });
+
+    // যদি আগে থেকেই লগইন করা থাকে, সরাসরি ড্যাশবোর্ডে পাঠিয়ে দাও
+    (async () => {
+      const user = await getCurrentUser();
+      if (user) window.location.replace("dashboard.html");
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minbar Assistant — হিসাব রিপোর্ট</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Hind Siliguri', sans-serif; color: #20241F; margin: 0; padding: 24px; }
+    h1 { font-family: 'Noto Serif Bengali', serif; color: #123832; margin: 0 0 2px; }
+    .meta { color: #5B6660; font-size: 13px; margin-bottom: 18px; }
+    .summary { display:flex; gap:14px; margin-bottom: 20px; }
+    .summary div { flex:1; border: 1px solid #E1DCCB; border-radius: 10px; padding: 12px; text-align:center; }
+    .summary .label { font-size:12px; color:#5B6660; }
+    .summary .val { font-size:18px; font-weight:700; margin-top:2px; }
+    table { width:100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #E1DCCB; }
+    th { background: #F2EEE3; }
+    .income { color: #2F7A52; }
+    .expense { color: #A6462F; }
+    .no-print { margin-bottom: 16px; }
+    .no-print button {
+      background:#C9982E; color:#123832; border:none; padding:10px 20px; border-radius:999px;
+      font-weight:700; font-size:14px; cursor:pointer;
+    }
+    @media print { .no-print { display:none; } }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="display:flex; gap:10px; align-items:center;">
+    <button onclick="window.location.href='finance-list.html'" style="background:#F2EEE3; border:1px solid #E1DCCB; width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:16px;">←</button>
+    <button onclick="window.print()">🖨️ PDF হিসেবে সেভ / প্রিন্ট করুন</button>
+  </div>
+
+  <h1 id="rInstName">হিসাব রিপোর্ট</h1>
+  <div class="meta" id="rMeta">লোড হচ্ছে...</div>
+
+  <div class="summary">
+    <div><div class="label">মোট আয়</div><div class="val income" id="rIncome">৳০</div></div>
+    <div><div class="label">মোট ব্যয়</div><div class="val expense" id="rExpense">৳০</div></div>
+    <div><div class="label">নীট</div><div class="val" id="rNet">৳০</div></div>
+  </div>
+
+  <table>
+    <thead><tr><th>তারিখ</th><th>ধরন</th><th>ক্যাটাগরি</th><th>বিবরণ</th><th style="text-align:right;">পরিমাণ</th></tr></thead>
+    <tbody id="rRows"></tbody>
+  </table>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    function formatMoney(n) { return "৳" + Number(n || 0).toLocaleString("en-BD"); }
+    function escapeHtml(str) { const d = document.createElement("div"); d.textContent = str || ""; return d.innerHTML; }
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status !== "ok") { window.location.replace("finance-list.html"); return; }
+
+      document.getElementById("rInstName").textContent = inst.institution.name + " — হিসাব রিপোর্ট";
+      document.getElementById("rMeta").textContent = "তৈরির তারিখ: " + new Date().toLocaleDateString("bn-BD");
+
+      const { data: txs } = await db
+        .from("transactions")
+        .select("type, amount, description, transaction_date, finance_categories(name)")
+        .eq("institution_id", inst.id)
+        .order("transaction_date", { ascending: false });
+
+      const rows = txs || [];
+      const income = rows.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
+      const expense = rows.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+      document.getElementById("rIncome").textContent = formatMoney(income);
+      document.getElementById("rExpense").textContent = formatMoney(expense);
+      document.getElementById("rNet").textContent = formatMoney(income - expense);
+
+      document.getElementById("rRows").innerHTML = rows
+        .map(
+          (t) => `<tr>
+            <td>${t.transaction_date}</td>
+            <td class="${t.type}">${t.type === "income" ? "আয়" : "ব্যয়"}</td>
+            <td>${escapeHtml(t.finance_categories ? t.finance_categories.name : "সাধারণ")}</td>
+            <td>${escapeHtml(t.description || "")}</td>
+            <td style="text-align:right;" class="${t.type}">${t.type === "income" ? "+" : "-"}${formatMoney(t.amount)}</td>
+          </tr>`
+        )
+        .join("");
+    })();
+  </script>
+</body>
+</html>

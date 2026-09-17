@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — ভিডিও স্টোরেজ প্যাকেজ</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .plan-card {
+      border: 1.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 18px;
+      margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface);
+    }
+    .plan-card.best { border-color: var(--gold-600); background: rgba(201,152,46,0.06); position: relative; }
+    .plan-card.best::before {
+      content: "সবচেয়ে জনপ্রিয়"; position: absolute; top: -11px; left: 16px; background: var(--gold-600);
+      color: var(--teal-900); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-pill);
+    }
+    .plan-gb { font-size: 22px; font-weight: 700; color: var(--teal-900); }
+    .plan-rate { font-size: 12px; color: var(--ink-muted); }
+    .plan-price { font-size: 20px; font-weight: 700; color: var(--gold-700); text-align: right; }
+    .plan-price small { display:block; font-size: 11px; color: var(--ink-muted); font-weight:500; }
+    .how-box { background: var(--surface-sunken); border-radius: var(--radius-md); padding: 16px; margin-top: var(--space-4); }
+    .how-box ol { margin: 8px 0 0; padding-right: 18px; font-size: 14px; line-height: 1.9; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row" style="gap:10px; margin-bottom:6px;">
+        <button class="back-btn" onclick="window.location.href='bayan-form.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <h1 style="margin:0;">ভিডিও স্টোরেজ প্যাকেজ</h1>
+      </div>
+      <p>সরাসরি ভিডিও আপলোড করতে একটা প্যাকেজ কিনুন</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="card">
+        <p class="muted" style="margin-bottom:16px;">ইউটিউব/ফেসবুক লিংক দেওয়া সবসময় <b>সম্পূর্ণ ফ্রি</b>। সরাসরি ভিডিও ফাইল আপলোড করতে চাইলে নিচের প্যাকেজগুলোর যেকোনো একটা নিতে পারেন।</p>
+
+        <div class="plan-card">
+          <div><div class="plan-gb">৫ জিবি</div><div class="plan-rate">৳২০০/জিবি</div></div>
+          <div class="plan-price">৳১,০০০ <small>/ মাস</small></div>
+        </div>
+        <div class="plan-card best">
+          <div><div class="plan-gb">১০ জিবি</div><div class="plan-rate">৳১৯০/জিবি</div></div>
+          <div class="plan-price">৳১,৯০০ <small>/ মাস</small></div>
+        </div>
+        <div class="plan-card">
+          <div><div class="plan-gb">১৫ জিবি</div><div class="plan-rate">৳১৮৭/জিবি</div></div>
+          <div class="plan-price">৳২,৮০০ <small>/ মাস</small></div>
+        </div>
+        <div class="plan-card">
+          <div><div class="plan-gb">২০ জিবি</div><div class="plan-rate">৳১৮৫/জিবি</div></div>
+          <div class="plan-price">৳৩,৭০০ <small>/ মাস</small></div>
+        </div>
+
+        <p class="small muted text-center" style="margin-top:6px;">যত বেশি জিবি নেবেন, প্রতি জিবির দাম তত কমবে।</p>
+
+        <div class="how-box">
+          <b>যেভাবে সক্রিয় করবেন</b>
+          <ol>
+            <li>পছন্দের প্যাকেজের টাকা bKash/Nagad-এ পাঠান</li>
+            <li>পেমেন্টের স্ক্রিনশট দিয়ে "মতামত/অভিযোগ" পেজ থেকে জানান, অথবা সরাসরি যোগাযোগ করুন</li>
+            <li>যাচাই করে আপনার প্রতিষ্ঠানের জন্য ভিডিও কোটা চালু করে দেওয়া হবে</li>
+            <li>এরপর বায়ান পেজ থেকে সরাসরি ভিডিও ফাইল আপলোড করতে পারবেন</li>
+          </ol>
+        </div>
+
+        <button class="btn btn--primary mt-6" onclick="window.location.href='feedback.html'">যোগাযোগ করুন</button>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

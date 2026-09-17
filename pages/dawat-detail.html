@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — দাওয়াত বিস্তারিত</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>    .icon-btn { background: rgba(250,246,239,0.12); border:none; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--parchment); }
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: var(--space-4) 0; }
+    .info-row { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .info-row:last-child { border-bottom:none; }
+    .info-row .icon { font-size:18px; }
+    .status-actions { display:flex; gap:10px; }
+    .status-actions .btn { padding: 11px; font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row-between">
+        <button class="back-btn" onclick="window.location.href='dawat-list.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+        <button class="icon-btn" id="deleteBtn" title="মুছুন">🗑️</button>
+      </div>
+      <h1 id="hName" style="margin-top:8px;">লোড হচ্ছে...</h1>
+      <p id="hDate"></p>
+    </header>
+
+    <main class="screen" style="margin-top:-20px;">
+      <div class="action-row">
+        <a class="btn btn--secondary" id="callBtn" href="#" style="text-decoration:none;">📞 কল করুন</a>
+        <a class="btn btn--secondary" id="mapBtn" href="#" target="_blank" style="text-decoration:none;">🗺️ ম্যাপে দেখুন</a>
+      </div>
+
+      <div class="card">
+        <div class="info-row"><span class="icon">📍</span><span id="dAddress" class="muted">—</span></div>
+        <div class="info-row"><span class="icon">📞</span><span id="dPhone" class="muted">—</span></div>
+        <div class="info-row"><span class="icon">⏰</span><span id="dReminder" class="muted">—</span></div>
+        <div class="info-row"><span class="icon">📝</span><span id="dNote" class="muted">—</span></div>
+      </div>
+
+      <h3 class="mt-6">স্ট্যাটাস আপডেট করুন</h3>
+      <div class="status-actions">
+        <button class="btn btn--primary" id="markCompleted">✅ সম্পন্ন</button>
+        <button class="btn btn--ghost" id="markCancelled">❌ বাতিল</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    const params = new URLSearchParams(window.location.search);
+    const dawatId = params.get("id");
+
+    function formatDateTime(dtStr) {
+      if (!dtStr) return "";
+      const d = new Date(dtStr);
+      const months = ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
+      let h = d.getHours();
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      const m = String(d.getMinutes()).padStart(2, "0");
+      return d.getDate() + " " + months[d.getMonth()] + ", " + h + ":" + m + " " + ampm;
+    }
+
+    const reminderLabels = { 0: "রিমাইন্ডার নেই", 30: "৩০ মিনিট আগে", 60: "১ ঘণ্টা আগে", 120: "২ ঘণ্টা আগে", 1440: "১ দিন আগে" };
+
+    async function load() {
+      if (!dawatId) { window.location.href = "dawat-list.html"; return; }
+      const { data: d, error } = await db.from("dawats").select("*").eq("id", dawatId).single();
+      if (error || !d) { window.location.href = "dawat-list.html"; return; }
+
+      document.getElementById("hName").textContent = d.host_name;
+      document.getElementById("hDate").textContent = formatDateTime(d.dawat_datetime);
+      document.getElementById("dAddress").textContent = d.address || "ঠিকানা দেওয়া হয়নি";
+      document.getElementById("dPhone").textContent = d.host_phone || "নম্বর দেওয়া হয়নি";
+      document.getElementById("dReminder").textContent = reminderLabels[d.reminder_minutes_before] || "—";
+      document.getElementById("dNote").textContent = d.note || "কোনো নোট নেই";
+
+      const callBtn = document.getElementById("callBtn");
+      if (d.host_phone) callBtn.href = "tel:" + d.host_phone;
+      else callBtn.style.opacity = "0.5";
+
+      const mapBtn = document.getElementById("mapBtn");
+      if (d.address) mapBtn.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(d.address);
+      else mapBtn.style.opacity = "0.5";
+
+      updateStatusButtons(d.status);
+    }
+
+    function updateStatusButtons(status) {
+      document.getElementById("markCompleted").disabled = status === "completed";
+      document.getElementById("markCancelled").disabled = status === "cancelled";
+    }
+
+    async function setStatus(status) {
+      await db.from("dawats").update({ status }).eq("id", dawatId);
+      updateStatusButtons(status);
+    }
+
+    document.getElementById("markCompleted").addEventListener("click", () => setStatus("completed"));
+    document.getElementById("markCancelled").addEventListener("click", () => setStatus("cancelled"));
+
+    document.getElementById("deleteBtn").addEventListener("click", async () => {
+      if (!(await showAppConfirm("এই দাওয়াতটি মুছে ফেলতে চান?", "🗑️"))) return;
+      await db.from("dawats").delete().eq("id", dawatId);
+      window.location.href = "dawat-list.html";
+    });
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      await load();
+    })();
+  </script>
+</body>
+</html>

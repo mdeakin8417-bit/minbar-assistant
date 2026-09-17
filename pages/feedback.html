@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — মতামত পাঠান</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .cat-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: var(--space-4); }
+    .cat-chip {
+      padding: 9px 14px; border-radius: var(--radius-pill); border: 1.5px solid var(--border-strong);
+      background: var(--surface); font-size: 13.5px; font-weight: 600; color: var(--ink-muted); cursor: pointer;
+    }
+    .cat-chip.selected { background: var(--teal-800); border-color: var(--teal-800); color: var(--parchment); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row" style="gap:10px; margin-bottom:6px;">
+        <button class="back-btn" onclick="window.location.href='settings.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <h1 style="margin:0;" data-i18n="feedbackTitle">মতামত পাঠান</h1>
+      </div>
+      <p data-i18n="feedbackSubtitle">আপনার মতামত সরাসরি আমাদের কাছে পৌঁছাবে</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="card" style="box-shadow: var(--shadow-raised);">
+        <div id="alertBox" class="alert"></div>
+
+        <label style="font-size:14px; font-weight:600; color:var(--teal-900); margin-bottom:8px; display:block;" data-i18n="chooseType">ধরন বেছে নিন</label>
+        <div class="cat-grid" id="catGrid">
+          <div class="cat-chip selected" data-cat="suggestion" data-i18n="suggestionCat">💡 পরামর্শ</div>
+          <div class="cat-chip" data-cat="bug" data-i18n="bugCat">🐞 সমস্যা/বাগ</div>
+          <div class="cat-chip" data-cat="complaint" data-i18n="complaintCat">😕 অভিযোগ</div>
+          <div class="cat-chip" data-cat="general" data-i18n="generalCat">💬 সাধারণ</div>
+        </div>
+
+        <div class="field">
+          <label for="message" data-i18n="yourFeedback">আপনার মতামত লিখুন</label>
+          <textarea id="message" rows="7" placeholder="যা বলতে চান বিস্তারিত লিখুন..."></textarea>
+        </div>
+
+        <button type="button" class="btn btn--primary" id="sendBtn">
+          <span class="btn-label" data-i18n="sendBtn">পাঠিয়ে দিন</span>
+        </button>
+
+        <p class="small text-center muted mt-6">আপনার নাম ও ইমেইল স্বয়ংক্রিয়ভাবে যুক্ত থাকবে, যাতে প্রয়োজনে যোগাযোগ করা যায়। এটা কোথাও প্রকাশ্যে দেখানো হয় না।</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let selectedCategory = "suggestion";
+    let currentUser = null;
+    let institutionId = null;
+
+    document.querySelectorAll(".cat-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".cat-chip").forEach((c) => c.classList.remove("selected"));
+        chip.classList.add("selected");
+        selectedCategory = chip.dataset.cat;
+      });
+    });
+
+    const alertBox = document.getElementById("alertBox");
+    function showAlert(m, t) { alertBox.textContent = m; alertBox.className = "alert show alert--" + t; }
+
+    document.getElementById("sendBtn").addEventListener("click", async () => {
+      const message = document.getElementById("message").value.trim();
+      if (!message) { showAlert("কিছু লিখুন।", "error"); return; }
+
+      const btn = document.getElementById("sendBtn");
+      btn.disabled = true;
+      btn.querySelector(".btn-label").textContent = "পাঠানো হচ্ছে...";
+
+      const { error } = await db.from("feedback").insert({
+        user_id: currentUser.id,
+        institution_id: institutionId,
+        category: selectedCategory,
+        message,
+      });
+
+      btn.disabled = false;
+      btn.querySelector(".btn-label").textContent = "পাঠিয়ে দিন";
+
+      if (error) {
+        showAlert("পাঠানো যায়নি: " + error.message, "error");
+        return;
+      }
+      showAlert("ধন্যবাদ! আপনার মতামত পৌঁছে গেছে। ✅", "success");
+      document.getElementById("message").value = "";
+    });
+
+    (async () => {
+      currentUser = await getCurrentUser();
+      if (!currentUser) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status === "ok") institutionId = inst.id;
+    })();
+  </script>
+</body>
+</html>
