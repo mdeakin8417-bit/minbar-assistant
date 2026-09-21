@@ -15,20 +15,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/styles.css" />
   <style>
-    .plan-card {
-      border: 1.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 18px;
-      margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
-      background: var(--surface);
+    .topup-card {
+      border: 1.5px solid var(--gold-600); border-radius: var(--radius-lg); padding: 20px;
+      margin-bottom: 16px; text-align: center; background: rgba(201,152,46,0.06);
     }
-    .plan-card.best { border-color: var(--gold-600); background: rgba(201,152,46,0.06); position: relative; }
-    .plan-card.best::before {
-      content: "সবচেয়ে জনপ্রিয়"; position: absolute; top: -11px; left: 16px; background: var(--gold-600);
-      color: var(--teal-900); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-pill);
-    }
-    .plan-gb { font-size: 22px; font-weight: 700; color: var(--teal-900); }
-    .plan-rate { font-size: 12px; color: var(--ink-muted); }
-    .plan-price { font-size: 20px; font-weight: 700; color: var(--gold-700); text-align: right; }
-    .plan-price small { display:block; font-size: 11px; color: var(--ink-muted); font-weight:500; }
+    .topup-gb { font-size: 28px; font-weight: 700; color: var(--teal-900); }
+    .topup-price { font-size: 22px; font-weight: 700; color: var(--gold-700); margin-top: 4px; }
+    .topup-note { font-size: 12.5px; color: var(--ink-muted); margin-top: 6px; }
+    .stack-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
+    .stack-table th, .stack-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--border); }
+    .stack-table th { color: var(--ink-muted); font-weight: 600; font-size: 12px; }
+    .stack-table td:last-child { font-weight: 700; color: var(--teal-800); }
     .how-box { background: var(--surface-sunken); border-radius: var(--radius-md); padding: 16px; margin-top: var(--space-4); }
     .how-box ol { margin: 8px 0 0; padding-right: 18px; font-size: 14px; line-height: 1.9; }
   </style>
@@ -47,34 +44,32 @@
 
     <main class="screen" style="margin-top:-24px;">
       <div class="card">
-        <p class="muted" style="margin-bottom:16px;">ইউটিউব/ফেসবুক লিংক দেওয়া সবসময় <b>সম্পূর্ণ ফ্রি</b>। সরাসরি ভিডিও ফাইল আপলোড করতে চাইলে নিচের প্যাকেজগুলোর যেকোনো একটা নিতে পারেন।</p>
+        <p class="muted" style="margin-bottom:16px;">ইউটিউব/ফেসবুক লিংক দেওয়া সবসময় <b>সম্পূর্ণ ফ্রি</b>। সরাসরি ভিডিও ফাইল আপলোড করতে চাইলে একবার টাকা দিয়ে স্টোরেজ কিনে নিন — <b>মাসিক কোনো চার্জ নেই</b>, যা কিনবেন তা সারাজীবন থাকবে।</p>
 
-        <div class="plan-card">
-          <div><div class="plan-gb">৫ জিবি</div><div class="plan-rate">৳২০০/জিবি</div></div>
-          <div class="plan-price">৳১,০০০ <small>/ মাস</small></div>
-        </div>
-        <div class="plan-card best">
-          <div><div class="plan-gb">১০ জিবি</div><div class="plan-rate">৳১৯০/জিবি</div></div>
-          <div class="plan-price">৳১,৯০০ <small>/ মাস</small></div>
-        </div>
-        <div class="plan-card">
-          <div><div class="plan-gb">১৫ জিবি</div><div class="plan-rate">৳১৮৭/জিবি</div></div>
-          <div class="plan-price">৳২,৮০০ <small>/ মাস</small></div>
-        </div>
-        <div class="plan-card">
-          <div><div class="plan-gb">২০ জিবি</div><div class="plan-rate">৳১৮৫/জিবি</div></div>
-          <div class="plan-price">৳৩,৭০০ <small>/ মাস</small></div>
+        <div class="topup-card">
+          <div class="topup-gb">+ ৫ জিবি</div>
+          <div class="topup-price">৳১,০০০</div>
+          <div class="topup-note">একবারের পেমেন্ট · সারাজীবনের জন্য</div>
         </div>
 
-        <p class="small muted text-center" style="margin-top:6px;">যত বেশি জিবি নেবেন, প্রতি জিবির দাম তত কমবে।</p>
+        <p class="small muted text-center" style="margin-top:6px;">যতবার ইচ্ছা ততবার কিনতে পারবেন — প্রতিবার কেনায় আগের কোটার সাথে নতুন ৫ জিবি যোগ হয়ে যাবে।</p>
+
+        <table class="stack-table">
+          <tr><th>মোট পেমেন্ট</th><th>মোট স্টোরেজ</th></tr>
+          <tr><td>৳১,০০০ (১ম বার)</td><td>৫ জিবি</td></tr>
+          <tr><td>৳২,০০০ (২য় বার)</td><td>১০ জিবি</td></tr>
+          <tr><td>৳৩,০০০ (৩য় বার)</td><td>১৫ জিবি</td></tr>
+          <tr><td>৳৪,০০০ (৪র্থ বার)</td><td>২০ জিবি</td></tr>
+        </table>
 
         <div class="how-box">
           <b>যেভাবে সক্রিয় করবেন</b>
           <ol>
-            <li>পছন্দের প্যাকেজের টাকা bKash/Nagad-এ পাঠান</li>
+            <li>৫ জিবির জন্য ৳১,০০০ bKash/Nagad-এ পাঠান</li>
             <li>পেমেন্টের স্ক্রিনশট দিয়ে "মতামত/অভিযোগ" পেজ থেকে জানান, অথবা সরাসরি যোগাযোগ করুন</li>
-            <li>যাচাই করে আপনার প্রতিষ্ঠানের জন্য ভিডিও কোটা চালু করে দেওয়া হবে</li>
+            <li>যাচাই করে আপনার প্রতিষ্ঠানের আগের কোটার সাথে নতুন ৫ জিবি যোগ করে দেওয়া হবে</li>
             <li>এরপর বায়ান পেজ থেকে সরাসরি ভিডিও ফাইল আপলোড করতে পারবেন</li>
+            <li>আরও স্টোরেজ লাগলে যেকোনো সময় আবার ৳১,০০০ দিয়ে আরও ৫ জিবি যোগ করতে পারবেন</li>
           </ol>
         </div>
 

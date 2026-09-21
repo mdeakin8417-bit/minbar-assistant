@@ -202,25 +202,41 @@
           <b>${escapeHtml(inst.name)}</b>
           <p class="small muted" style="margin:2px 0 8px;">বর্তমান কোটা: ${(inst.video_quota_mb / 1024).toFixed(1)} জিবি (ব্যবহৃত: ${(inst.video_used_mb / 1024).toFixed(2)} জিবি)</p>
           <div class="row" style="gap:8px;">
-            <select id="quota-select-${inst.id}" style="flex:1; padding:8px; border-radius:8px; border:1.5px solid var(--border-strong); background:var(--surface); color:var(--ink);">
-              <option value="0">বন্ধ (০ জিবি)</option>
-              <option value="5120">৫ জিবি</option>
-              <option value="10240">১০ জিবি</option>
-              <option value="15360">১৫ জিবি</option>
-              <option value="20480">২০ জিবি</option>
-            </select>
-            <button class="btn btn--primary" style="width:auto; padding:8px 16px;" onclick="setQuota('${inst.id}')">সেট করুন</button>
+            <button class="btn btn--primary" style="flex:1; padding:8px 12px;" onclick="addQuota('${inst.id}', ${inst.video_quota_mb})">➕ ৫ জিবি যোগ করুন (৳১,০০০ পেমেন্ট নিশ্চিত হলে)</button>
+          </div>
+          <div class="row" style="gap:8px; margin-top:8px;">
+            <button class="btn btn--ghost" style="flex:1; padding:7px 12px; font-size:12.5px;" onclick="setCustomQuota('${inst.id}')">কাস্টম পরিমাণ সেট করুন</button>
           </div>
         </div>`
         )
         .join("");
     }
 
-    async function setQuota(instId) {
-      const mb = parseInt(document.getElementById("quota-select-" + instId).value, 10);
+    // প্রতিবার পেমেন্ট নিশ্চিত হলে আগের কোটার সাথে নতুন ৫ জিবি (৫১২০ এমবি) যোগ হবে — রিপ্লেস না, কিউমুলেটিভ
+    async function addQuota(instId, currentQuotaMb) {
+      const newQuotaMb = currentQuotaMb + 5120;
+      const confirmed = await showAppConfirm(
+        "বর্তমান কোটা " + (currentQuotaMb / 1024).toFixed(1) + " জিবি থেকে বেড়ে " + (newQuotaMb / 1024).toFixed(1) + " জিবি হবে। নিশ্চিত?",
+        "➕"
+      );
+      if (!confirmed) return;
+      const { error } = await db.from("institutions").update({ video_quota_mb: newQuotaMb }).eq("id", instId);
+      if (error) { await showAppAlert("যোগ করা যায়নি: " + error.message, "⚠️"); return; }
+      await showAppAlert("৫ জিবি যোগ হয়েছে! মোট কোটা এখন " + (newQuotaMb / 1024).toFixed(1) + " জিবি।", "✅");
+      document.getElementById("quotaInstSearch").value = "";
+      document.getElementById("quotaSearchResults").innerHTML = "";
+    }
+
+    // ব্যতিক্রমী পরিস্থিতির জন্য (যেমন ভুল ঠিক করা বা বন্ধ করা) — সরাসরি নির্দিষ্ট পরিমাণে সেট করা
+    async function setCustomQuota(instId) {
+      const gbStr = await showAppPrompt("মোট কোটা কত জিবি হবে?", "🎛️", "যেমন: ৫০ (বন্ধ করতে ০ দিন)");
+      if (gbStr === null || gbStr === "") return;
+      const gb = parseFloat(gbStr);
+      if (isNaN(gb) || gb < 0) { await showAppAlert("সঠিক সংখ্যা দিন।", "⚠️"); return; }
+      const mb = Math.round(gb * 1024);
       const { error } = await db.from("institutions").update({ video_quota_mb: mb }).eq("id", instId);
       if (error) { await showAppAlert("সেট করা যায়নি: " + error.message, "⚠️"); return; }
-      await showAppAlert("কোটা আপডেট হয়েছে!", "✅");
+      await showAppAlert("কোটা সেট হয়েছে: " + gb + " জিবি।", "✅");
       document.getElementById("quotaInstSearch").value = "";
       document.getElementById("quotaSearchResults").innerHTML = "";
     }
