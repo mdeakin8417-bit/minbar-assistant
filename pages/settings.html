@@ -99,9 +99,9 @@
             <span class="switch-slider"></span>
           </label>
         </div>
-        <div class="settings-row" onclick="window.location.href='ai-premium.html'">
+        <div class="settings-row" id="aiRow" onclick="window.location.href='ai-premium.html'">
           <div class="left"><span class="icon">🤖</span><span data-i18n="aiAssistant">AI সহকারী</span></div>
-          <span class="small" style="color:var(--gold-700); font-weight:700;" data-i18n="premium">✨ প্রিমিয়াম</span>
+          <span class="small" id="aiRowBadge" style="color:var(--gold-700); font-weight:700;" data-i18n="premium">✨ প্রিমিয়াম</span>
         </div>
         <div class="settings-row" onclick="window.location.href='video-premium.html'">
           <div class="left"><span class="icon">🎬</span><span data-i18n="videoStorageRow">ভিডিও স্টোরেজ প্যাকেজ</span></div>
@@ -300,6 +300,16 @@
 
       if (user.id === "8581fa4f-c7d7-4b02-a63e-c9c2b8a6eabb") {
         document.getElementById("adminRow").style.display = "flex";
+      }
+
+      // AI সহকারী চালু আছে কিনা (এডমিন সবসময় পাবে) — থাকলে সরাসরি চ্যাট পেজে পাঠাবে, নাহলে প্রিমিয়াম তথ্য পেজে
+      const aiOn = await isAiEnabled();
+      if (aiOn) {
+        const aiRow = document.getElementById("aiRow");
+        aiRow.setAttribute("onclick", "window.location.href='ai-chat.html'");
+        const badge = document.getElementById("aiRowBadge");
+        badge.textContent = "✅ চালু আছে";
+        badge.style.color = "var(--income)";
       }
     })();
   </script>

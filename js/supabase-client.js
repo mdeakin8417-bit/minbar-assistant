@@ -15,6 +15,20 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   },
 });
 
+// অ্যাপ ফাউন্ডার/এডমিন — এই ইউজার সবসময় সব প্রিমিয়াম ফিচার (AI ইত্যাদি) বিনামূল্যে পাবে
+const ADMIN_USER_ID = "8581fa4f-c7d7-4b02-a63e-c9c2b8a6eabb";
+
+// বর্তমান ইউজার/প্রতিষ্ঠানের জন্য AI সহকারী চালু আছে কিনা — এডমিন সবসময় true পাবে,
+// বাকিদের জন্য প্রতিষ্ঠানের ai_enabled ফ্ল্যাগ চেক হবে (এডমিন প্যানেল থেকে ম্যানুয়ালি চালু করা হয়)
+async function isAiEnabled() {
+  const user = await getCurrentUser();
+  if (!user) return false;
+  if (user.id === ADMIN_USER_ID) return true;
+  const inst = await getCurrentInstitution();
+  if (inst.status !== "ok") return false;
+  return !!inst.institution.ai_enabled;
+}
+
 // ---------- অ্যাপ লক (PIN/প্যাটার্ন/বায়োমেট্রিক) হেল্পার ----------
 async function sha256Hex(text) {
   const enc = new TextEncoder().encode(text);
@@ -120,7 +134,7 @@ async function getAllInstitutions() {
   try {
     const { data, error } = await db
       .from("institutions")
-      .select("id, name, type, video_quota_mb, video_used_mb")
+      .select("id, name, type, video_quota_mb, video_used_mb, ai_enabled")
       .order("created_at", { ascending: true });
     if (error) return { status: "error", message: error.message };
     return { status: "ok", institutions: data || [] };

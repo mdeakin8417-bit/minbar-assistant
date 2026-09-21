@@ -87,7 +87,9 @@
           <div class="small" style="opacity:0.8; margin-top:4px;">বিস্তারিত জানতে যোগাযোগ করুন</div>
         </div>
 
-        <p class="small text-center muted">বাকি সব ফিচার (বায়ান, দাওয়াত, হিসাব) সম্পূর্ণ ফ্রি — এটি একটি ঐচ্ছিক বাড়তি সুবিধা।</p>
+        <button class="btn btn--primary" onclick="window.location.href='feedback.html?category=ai_premium'">যোগাযোগ করুন</button>
+
+        <p class="small text-center muted mt-6">বাকি সব ফিচার (বায়ান, দাওয়াত, হিসাব) সম্পূর্ণ ফ্রি — এটি একটি ঐচ্ছিক বাড়তি সুবিধা।</p>
       </div>
 
       <div class="lang-en" style="display:none;">
@@ -134,7 +136,17 @@
       </div>
     </main>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="../js/i18n.js"></script>
-  <script>applyTranslations();</script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const aiOn = await isAiEnabled();
+      if (aiOn) { window.location.replace("ai-chat.html"); }
+    })();
+  </script>
 </body>
 </html>

@@ -171,6 +171,8 @@
     (async () => {
       const user = await getCurrentUser();
       if (!user) { window.location.replace("login.html"); return; }
+      const aiOn = await isAiEnabled();
+      if (!aiOn) { window.location.replace("ai-premium.html"); return; }
       const inst = await getCurrentInstitution();
       if (inst.status === "ok") institutionId = inst.id;
     })();

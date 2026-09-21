@@ -29,6 +29,7 @@
     .fb-cat.complaint { background: rgba(201,152,46,0.15); color: var(--gold-700); }
     .fb-cat.general { background: var(--surface-sunken); color: var(--ink-muted); }
     .fb-cat.storage { background: rgba(18,56,50,0.12); color: var(--teal-800); }
+    .fb-cat.ai_premium { background: rgba(147,51,234,0.12); color: #7c3aed; }
     .fb-meta { font-size:12px; color: var(--ink-faint); margin-top:6px; }
     .filter-row { display:flex; gap:8px; overflow-x:auto; margin-bottom: var(--space-4); scrollbar-width:none; }
     .filter-chip { flex:0 0 auto; padding:7px 14px; border-radius: var(--radius-pill); background:var(--surface); border:1.5px solid var(--border-strong); font-size:13px; font-weight:600; color:var(--ink-muted); cursor:pointer; }
@@ -56,7 +57,7 @@
 
       <div class="type-breakdown" id="typeBreakdown"></div>
 
-      <h3 style="margin-bottom:10px;">ভিডিও কোটা চালু করুন</h3>
+      <h3 style="margin-bottom:10px;">প্রতিষ্ঠান ম্যানেজমেন্ট (ভিডিও কোটা ও AI)</h3>
       <div class="card" style="margin-bottom: var(--space-4);">
         <div class="field">
           <label for="quotaInstSearch">প্রতিষ্ঠানের নাম দিয়ে খুঁজুন</label>
@@ -69,6 +70,7 @@
       <div class="filter-row">
         <div class="filter-chip active" data-cat="all">সব</div>
         <div class="filter-chip" data-cat="storage">🎥 স্টোরেজ পেমেন্ট</div>
+        <div class="filter-chip" data-cat="ai_premium">🤖 AI প্রিমিয়াম</div>
         <div class="filter-chip" data-cat="suggestion">💡 পরামর্শ</div>
         <div class="filter-chip" data-cat="bug">🐞 বাগ</div>
         <div class="filter-chip" data-cat="complaint">😕 অভিযোগ</div>
@@ -84,8 +86,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script>
-    const ADMIN_USER_ID = "8581fa4f-c7d7-4b02-a63e-c9c2b8a6eabb";
-    const CAT_LABELS = { suggestion: "💡 পরামর্শ", bug: "🐞 বাগ", complaint: "😕 অভিযোগ", general: "💬 সাধারণ", storage: "🎥 স্টোরেজ পেমেন্ট" };
+    // ADMIN_USER_ID এখন js/supabase-client.js-এ শেয়ার্ড constant হিসেবে আছে
+    const CAT_LABELS = { suggestion: "💡 পরামর্শ", bug: "🐞 বাগ", complaint: "😕 অভিযোগ", general: "💬 সাধারণ", storage: "🎥 স্টোরেজ পেমেন্ট", ai_premium: "🤖 AI প্রিমিয়াম" };
     let allFeedback = [];
     let activeCat = "all";
 
@@ -111,8 +113,8 @@
           <p style="margin:0;">${escapeHtml(f.message)}</p>
           <div class="fb-meta">${escapeHtml(f.profile_name || "অজানা")} · ${formatDateTime(f.created_at)}${f.institution_name ? " · " + escapeHtml(f.institution_name) : ""}</div>
           ${
-            f.category === "storage" && f.institution_name
-              ? `<button class="btn btn--ghost" style="margin-top:8px; padding:6px 12px; font-size:12.5px; width:auto;" onclick="jumpToQuota('${escapeHtml(f.institution_name).replace(/'/g, "\\'")}')">📦 এই প্রতিষ্ঠানের কোটায় যান</button>`
+            (f.category === "storage" || f.category === "ai_premium") && f.institution_name
+              ? `<button class="btn btn--ghost" style="margin-top:8px; padding:6px 12px; font-size:12.5px; width:auto;" onclick="jumpToQuota('${escapeHtml(f.institution_name).replace(/'/g, "\\'")}')">📦 এই প্রতিষ্ঠানের কোটা/AI-তে যান</button>`
               : ""
           }
         </div>`
@@ -201,7 +203,7 @@
     async function searchInstitutionsForQuota(query) {
       const { data } = await db
         .from("institutions")
-        .select("id, name, type, video_quota_mb, video_used_mb")
+        .select("id, name, type, video_quota_mb, video_used_mb, ai_enabled")
         .ilike("name", "%" + query + "%")
         .limit(5);
 
@@ -216,15 +218,34 @@
         <div class="fb-card">
           <b>${escapeHtml(inst.name)}</b>
           <p class="small muted" style="margin:2px 0 8px;">বর্তমান কোটা: ${(inst.video_quota_mb / 1024).toFixed(1)} জিবি (ব্যবহৃত: ${(inst.video_used_mb / 1024).toFixed(2)} জিবি)</p>
+          <p class="small muted" style="margin:2px 0 8px;">AI সহকারী: ${inst.ai_enabled ? "✅ চালু আছে" : "❌ বন্ধ আছে"}</p>
           <div class="row" style="gap:8px;">
             <button class="btn btn--primary" style="flex:1; padding:8px 12px;" onclick="addQuota('${inst.id}', ${inst.video_quota_mb})">➕ ৫ জিবি যোগ করুন (৳১,০০০ পেমেন্ট নিশ্চিত হলে)</button>
           </div>
           <div class="row" style="gap:8px; margin-top:8px;">
             <button class="btn btn--ghost" style="flex:1; padding:7px 12px; font-size:12.5px;" onclick="setCustomQuota('${inst.id}')">কাস্টম পরিমাণ সেট করুন</button>
           </div>
+          <div class="row" style="gap:8px; margin-top:8px;">
+            <button class="btn ${inst.ai_enabled ? "btn--ghost" : "btn--primary"}" style="flex:1; padding:7px 12px; font-size:12.5px;" onclick="toggleAi('${inst.id}', ${inst.ai_enabled})">${inst.ai_enabled ? "🤖 AI বন্ধ করুন" : "🤖 AI চালু করুন (পেমেন্ট নিশ্চিত হলে)"}</button>
+          </div>
         </div>`
         )
         .join("");
+    }
+
+    // AI সহকারী চালু/বন্ধ করা — পেমেন্ট যাচাইয়ের পর ম্যানুয়ালি এডমিন টগল করবে
+    async function toggleAi(instId, currentlyEnabled) {
+      const newValue = !currentlyEnabled;
+      const confirmed = await showAppConfirm(
+        newValue ? "এই প্রতিষ্ঠানের জন্য AI সহকারী চালু করবেন?" : "এই প্রতিষ্ঠানের AI সহকারী বন্ধ করবেন?",
+        "🤖"
+      );
+      if (!confirmed) return;
+      const { error } = await db.from("institutions").update({ ai_enabled: newValue }).eq("id", instId);
+      if (error) { await showAppAlert("পরিবর্তন করা যায়নি: " + error.message, "⚠️"); return; }
+      await showAppAlert(newValue ? "AI চালু হয়েছে! ✅" : "AI বন্ধ করা হয়েছে।", "✅");
+      document.getElementById("quotaInstSearch").value = "";
+      document.getElementById("quotaSearchResults").innerHTML = "";
     }
 
     // প্রতিবার পেমেন্ট নিশ্চিত হলে আগের কোটার সাথে নতুন ৫ জিবি (৫১২০ এমবি) যোগ হবে — রিপ্লেস না, কিউমুলেটিভ
