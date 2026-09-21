@@ -45,6 +45,7 @@
           <div class="cat-chip" data-cat="bug" data-i18n="bugCat">🐞 সমস্যা/বাগ</div>
           <div class="cat-chip" data-cat="complaint" data-i18n="complaintCat">😕 অভিযোগ</div>
           <div class="cat-chip" data-cat="general" data-i18n="generalCat">💬 সাধারণ</div>
+          <div class="cat-chip" data-cat="storage">🎥 স্টোরেজ পেমেন্ট</div>
         </div>
 
         <div class="field">
@@ -69,6 +70,18 @@
     let selectedCategory = "suggestion";
     let currentUser = null;
     let institutionId = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const presetCategory = urlParams.get("category");
+    if (presetCategory && document.querySelector('.cat-chip[data-cat="' + presetCategory + '"]')) {
+      document.querySelectorAll(".cat-chip").forEach((c) => c.classList.remove("selected"));
+      document.querySelector('.cat-chip[data-cat="' + presetCategory + '"]').classList.add("selected");
+      selectedCategory = presetCategory;
+      if (presetCategory === "storage") {
+        document.getElementById("message").placeholder =
+          "যেমন: ৫ জিবি প্যাকেজের জন্য ৳১,০০০ bKash-এ পাঠিয়েছি। ট্রানজেকশন আইডি: ...";
+      }
+    }
 
     document.querySelectorAll(".cat-chip").forEach((chip) => {
       chip.addEventListener("click", () => {

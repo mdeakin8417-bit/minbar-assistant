@@ -28,6 +28,7 @@
     .fb-cat.bug { background: var(--expense-bg); color: var(--expense); }
     .fb-cat.complaint { background: rgba(201,152,46,0.15); color: var(--gold-700); }
     .fb-cat.general { background: var(--surface-sunken); color: var(--ink-muted); }
+    .fb-cat.storage { background: rgba(18,56,50,0.12); color: var(--teal-800); }
     .fb-meta { font-size:12px; color: var(--ink-faint); margin-top:6px; }
     .filter-row { display:flex; gap:8px; overflow-x:auto; margin-bottom: var(--space-4); scrollbar-width:none; }
     .filter-chip { flex:0 0 auto; padding:7px 14px; border-radius: var(--radius-pill); background:var(--surface); border:1.5px solid var(--border-strong); font-size:13px; font-weight:600; color:var(--ink-muted); cursor:pointer; }
@@ -67,6 +68,7 @@
       <h3 style="margin-bottom:10px;">মতামত ও অভিযোগ</h3>
       <div class="filter-row">
         <div class="filter-chip active" data-cat="all">সব</div>
+        <div class="filter-chip" data-cat="storage">🎥 স্টোরেজ পেমেন্ট</div>
         <div class="filter-chip" data-cat="suggestion">💡 পরামর্শ</div>
         <div class="filter-chip" data-cat="bug">🐞 বাগ</div>
         <div class="filter-chip" data-cat="complaint">😕 অভিযোগ</div>
@@ -83,7 +85,7 @@
   <script src="../js/supabase-client.js"></script>
   <script>
     const ADMIN_USER_ID = "8581fa4f-c7d7-4b02-a63e-c9c2b8a6eabb";
-    const CAT_LABELS = { suggestion: "💡 পরামর্শ", bug: "🐞 বাগ", complaint: "😕 অভিযোগ", general: "💬 সাধারণ" };
+    const CAT_LABELS = { suggestion: "💡 পরামর্শ", bug: "🐞 বাগ", complaint: "😕 অভিযোগ", general: "💬 সাধারণ", storage: "🎥 স্টোরেজ পেমেন্ট" };
     let allFeedback = [];
     let activeCat = "all";
 
@@ -108,9 +110,22 @@
           <span class="fb-cat ${f.category}">${CAT_LABELS[f.category] || f.category}</span>
           <p style="margin:0;">${escapeHtml(f.message)}</p>
           <div class="fb-meta">${escapeHtml(f.profile_name || "অজানা")} · ${formatDateTime(f.created_at)}${f.institution_name ? " · " + escapeHtml(f.institution_name) : ""}</div>
+          ${
+            f.category === "storage" && f.institution_name
+              ? `<button class="btn btn--ghost" style="margin-top:8px; padding:6px 12px; font-size:12.5px; width:auto;" onclick="jumpToQuota('${escapeHtml(f.institution_name).replace(/'/g, "\\'")}')">📦 এই প্রতিষ্ঠানের কোটায় যান</button>`
+              : ""
+          }
         </div>`
         )
         .join("");
+    }
+
+    // স্টোরেজ ফিডব্যাক কার্ড থেকে সরাসরি উপরের কোটা-সার্চ বক্সে গিয়ে ওই প্রতিষ্ঠান খুঁজে দেয়
+    function jumpToQuota(institutionName) {
+      const searchBox = document.getElementById("quotaInstSearch");
+      searchBox.scrollIntoView({ behavior: "smooth", block: "center" });
+      searchBox.value = institutionName;
+      searchBox.dispatchEvent(new Event("input"));
     }
 
     document.querySelectorAll(".filter-chip").forEach((chip) => {
