@@ -31,6 +31,26 @@
     .status-cancelled { background: var(--expense-bg); color: var(--expense); }
     .dawat-card h3 { font-size: 16.5px; margin: 4px 0 2px; }
 
+    .view-toggle { display:flex; gap:8px; margin-bottom: var(--space-4); }
+    .view-toggle button {
+      flex:1; padding:9px; border-radius: var(--radius-md); border:1.5px solid var(--border-strong);
+      background: var(--surface); color: var(--ink-muted); font-weight:600; font-size:13.5px; cursor:pointer;
+    }
+    .view-toggle button.active { background: var(--teal-800); border-color: var(--teal-800); color: var(--parchment); }
+    .cal-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .cal-nav button { background:none; border:none; font-size:20px; color: var(--teal-800); cursor:pointer; padding:4px 10px; }
+    .cal-grid { display:grid; grid-template-columns: repeat(7,1fr); gap:4px; text-align:center; }
+    .cal-grid .cal-wd { font-size:11px; color: var(--ink-muted); font-weight:600; padding-bottom:4px; }
+    .cal-day {
+      aspect-ratio: 1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      border-radius: var(--radius-sm); font-size:13px; cursor:pointer; position:relative;
+    }
+    .cal-day.today { border:1.5px solid var(--gold-600); }
+    .cal-day.selected { background: var(--teal-800); color: var(--parchment); }
+    .cal-day .dot { width:5px; height:5px; border-radius:50%; background: var(--gold-600); margin-top:2px; }
+    .cal-day.selected .dot { background: var(--gold-500); }
+    .cal-day.empty { visibility:hidden; }
+
     .fab-wrapper {
       position: fixed; inset: 0; max-width: 480px; margin: 0 auto; pointer-events: none; z-index: 20;
     }
@@ -50,7 +70,25 @@
     </header>
 
     <main class="screen" style="margin-top:-24px;">
-      <div class="chip-row">
+      <div class="view-toggle">
+        <button id="listViewBtn" class="active" onclick="switchView('list')">📋 লিস্ট</button>
+        <button id="calViewBtn" onclick="switchView('calendar')">🗓️ ক্যালেন্ডার</button>
+      </div>
+
+      <div id="calendarView" style="display:none;">
+        <div class="card" style="box-shadow: var(--shadow-raised);">
+          <div class="cal-nav">
+            <button onclick="changeMonth(-1)">‹</button>
+            <b id="calMonthLabel">···</b>
+            <button onclick="changeMonth(1)">›</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+        <div id="calDayList" class="stack" style="margin-top:16px;"></div>
+      </div>
+
+      <div id="listView">
+        <div class="chip-row">
         <div class="chip active" data-status="upcoming" data-i18n="statusUpcoming">উপক্রমিক</div>
         <div class="chip" data-status="completed" data-i18n="statusCompleted">সম্পন্ন</div>
         <div class="chip" data-status="cancelled" data-i18n="statusCancelled">বাতিল</div>
@@ -64,6 +102,7 @@
       <div id="emptyState" class="empty-state" style="display:none;">
         <div style="font-size:36px;">🍽️</div>
         <p data-i18n="noDawat">এই তালিকায় কোনো দাওয়াত নেই।</p>
+      </div>
       </div>
     </main>
 
@@ -188,12 +227,91 @@
         allDawats = getCachedListData("dawats_" + institutionId) || [];
         appendPendingOffline();
         renderList();
+        renderCalendar();
         return;
       }
       allDawats = data || [];
       cacheListData("dawats_" + institutionId, allDawats);
       appendPendingOffline();
       renderList();
+      renderCalendar();
+    }
+
+    // ---------- ক্যালেন্ডার ভিউ ----------
+    let calDate = new Date();
+    let calSelectedDate = null;
+
+    function switchView(view) {
+      document.getElementById("listView").style.display = view === "list" ? "block" : "none";
+      document.getElementById("calendarView").style.display = view === "calendar" ? "block" : "none";
+      document.getElementById("listViewBtn").classList.toggle("active", view === "list");
+      document.getElementById("calViewBtn").classList.toggle("active", view === "calendar");
+      if (view === "calendar") renderCalendar();
+    }
+
+    function changeMonth(delta) {
+      calDate = new Date(calDate.getFullYear(), calDate.getMonth() + delta, 1);
+      calSelectedDate = null;
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const monthsBn = ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+      const weekdaysBn = ["রবি","সোম","মঙ্গল","বুধ","বৃহ","শুক্র","শনি"];
+      document.getElementById("calMonthLabel").textContent = monthsBn[calDate.getMonth()] + " " + calDate.getFullYear();
+
+      const year = calDate.getFullYear();
+      const month = calDate.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const todayStr = new Date().toDateString();
+
+      // এই মাসে কোন কোন দিনে দাওয়াত আছে (real dawats, pending offline সহ)
+      const dawatsByDay = {};
+      allDawats.forEach((d) => {
+        const dt = new Date(d.dawat_datetime);
+        if (dt.getFullYear() === year && dt.getMonth() === month) {
+          const day = dt.getDate();
+          (dawatsByDay[day] = dawatsByDay[day] || []).push(d);
+        }
+      });
+
+      let html = weekdaysBn.map((w) => `<div class="cal-wd">${w}</div>`).join("");
+      for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cellDate = new Date(year, month, day);
+        const isToday = cellDate.toDateString() === todayStr;
+        const isSelected = calSelectedDate === day;
+        const hasDawat = !!dawatsByDay[day];
+        html += `<div class="cal-day ${isToday ? "today" : ""} ${isSelected ? "selected" : ""}" onclick="selectCalDay(${day})">${day}${hasDawat ? '<span class="dot"></span>' : ""}</div>`;
+      }
+      document.getElementById("calGrid").innerHTML = html;
+
+      if (calSelectedDate) renderCalDayList(dawatsByDay[calSelectedDate] || []);
+      else document.getElementById("calDayList").innerHTML = "";
+    }
+
+    function selectCalDay(day) {
+      calSelectedDate = day;
+      renderCalendar();
+    }
+
+    function renderCalDayList(dawatsOnDay) {
+      const el = document.getElementById("calDayList");
+      if (dawatsOnDay.length === 0) {
+        el.innerHTML = '<p class="muted small text-center">এই দিনে কোনো দাওয়াত নেই।</p>';
+        return;
+      }
+      el.innerHTML = dawatsOnDay
+        .map(
+          (d) => `
+        <div class="card dawat-card" onclick="window.location.href='dawat-detail.html?id=${d.id}'">
+          <span class="status-badge status-${d.status}">${statusLabels[d.status] || ""}</span>
+          <h3>${escapeHtml(d.host_name)}</h3>
+          <p class="small muted" style="margin:0;">🕐 ${escapeHtml(formatDateTime(d.dawat_datetime))}</p>
+        </div>`
+        )
+        .join("");
     }
 
     (async () => {
