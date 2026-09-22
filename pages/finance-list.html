@@ -306,8 +306,17 @@
       emptyEl.style.display = "none";
 
       listEl.innerHTML = filtered
-        .map(
-          (t) => `
+        .map((t) =>
+          t._pending
+            ? `
+        <div class="card tx-card" style="opacity:0.75;">
+          <div>
+            <div class="cat">⏳ সিঙ্ক হয়নি · ${formatDate(t.transaction_date)}</div>
+            <h3>${escapeHtml(t.description || (t.type === "income" ? "আয়" : "ব্যয়"))}</h3>
+          </div>
+          <div class="tx-amt ${t.type}">${t.type === "income" ? "+" : "-"}${formatMoney(t.amount)}</div>
+        </div>`
+            : `
         <div class="card tx-card" onclick="window.location.href='finance-detail.html?id=${t.id}'">
           <div>
             <div class="cat">${escapeHtml(t.category_name || "সাধারণ")} · ${formatDate(t.transaction_date)}</div>
@@ -348,6 +357,20 @@
       XLSX.writeFile(wb, fileName);
     });
 
+    // নেট আসার আগ পর্যন্ত ফোনে জমা থাকা (এখনো সিঙ্ক না হওয়া) লেনদেনগুলো তালিকায় যোগ করা
+    function appendPendingOffline() {
+      const pending = getPendingOfflineItems("transactions", institutionId).map((q) => ({
+        id: q.local_id,
+        type: q.payload.type,
+        amount: q.payload.amount,
+        description: q.payload.description,
+        transaction_date: q.payload.transaction_date,
+        category_name: null,
+        _pending: true,
+      }));
+      allTx = [...pending, ...allTx];
+    }
+
     async function loadTransactions() {
       const { data, error } = await db
         .from("transactions")
@@ -355,11 +378,16 @@
         .eq("institution_id", institutionId)
         .order("transaction_date", { ascending: false });
 
-      if (error) {
-        showConnectionError("লেনদেনের তথ্য লোড করা যায়নি।");
+      if (error || !navigator.onLine) {
+        allTx = getCachedListData("transactions_" + institutionId) || [];
+        appendPendingOffline();
+        renderSummary(institutionType);
+        renderList();
         return;
       }
       allTx = (data || []).map((t) => ({ ...t, category_name: t.finance_categories ? t.finance_categories.name : null }));
+      cacheListData("transactions_" + institutionId, allTx);
+      appendPendingOffline();
       renderSummary(institutionType);
       renderList();
     }

@@ -150,8 +150,17 @@
       emptyEl.style.display = "none";
 
       listEl.innerHTML = filtered
-        .map(
-          (b) => `
+        .map((b) =>
+          b._pending
+            ? `
+        <div class="card bayan-card" style="opacity:0.75;">
+          <div style="flex:1; min-width:0;">
+            <span class="bayan-cat" style="background:var(--surface-sunken); color:var(--ink-muted);">⏳ সিঙ্ক হয়নি</span>
+            <h3>${escapeHtml(b.title)}</h3>
+            <p class="small muted" style="margin:0;">${escapeHtml(formatDate(b.bayan_date))}</p>
+          </div>
+        </div>`
+            : `
         <div class="card bayan-card" onclick="window.location.href='bayan-detail.html?id=${b.id}'">
           <div style="flex:1; min-width:0;">
             ${b.category_name ? `<span class="bayan-cat">${escapeHtml(b.category_name)}</span>` : ""}
@@ -210,21 +219,39 @@
         .eq("institution_id", institutionId)
         .order("bayan_date", { ascending: false });
 
-      const { data: favorites } = await db.from("bayan_favorites").select("bayan_id").eq("user_id", user.id);
-      const favSet = new Set((favorites || []).map((f) => f.bayan_id));
-
-      if (error) {
-        document.getElementById("bayanList").innerHTML = "";
-        document.getElementById("emptyState").style.display = "block";
+      if (error || !navigator.onLine) {
+        const cached = getCachedListData("bayans_" + institutionId) || [];
+        allBayans = cached.map((b) => ({ ...b, is_favorite: false }));
+        appendPendingOffline();
+        renderList();
         return;
       }
+
+      const { data: favorites } = await db.from("bayan_favorites").select("bayan_id").eq("user_id", user.id);
+      const favSet = new Set((favorites || []).map((f) => f.bayan_id));
 
       allBayans = (bayans || []).map((b) => ({
         ...b,
         category_name: b.bayan_categories ? b.bayan_categories.name : null,
         is_favorite: favSet.has(b.id),
       }));
+      cacheListData("bayans_" + institutionId, allBayans);
+      appendPendingOffline();
       renderList();
+    }
+
+    // নেট আসার আগ পর্যন্ত ফোনে জমা থাকা (এখনো সিঙ্ক না হওয়া) বায়ানগুলো তালিকার উপরে দেখানো
+    function appendPendingOffline() {
+      const pending = getPendingOfflineItems("bayans", institutionId).map((q) => ({
+        id: q.local_id,
+        title: q.payload.title,
+        content: q.payload.content,
+        bayan_date: q.payload.bayan_date,
+        category_name: null,
+        is_favorite: false,
+        _pending: true,
+      }));
+      allBayans = [...pending, ...allBayans];
     }
 
     document.getElementById("searchInput").addEventListener("input", renderList);

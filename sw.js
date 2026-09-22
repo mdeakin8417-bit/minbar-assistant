@@ -1,21 +1,32 @@
 // ==========================================================
 // Minbar Assistant — Service Worker
-// শুধু স্ট্যাটিক ফাইল (css/js/icons) ক্যাশ করে — HTML পেজ সবসময়
-// নেটওয়ার্ক থেকে সরাসরি লোড হয়, যাতে পুরনো/স্টেল পেজ কখনো না দেখায়।
+// স্ট্যাটিক ফাইল + HTML পেজ — নেটওয়ার্ক আগে (সবসময় সর্বশেষ ভার্সন),
+// নেট না থাকলে ক্যাশ থেকে (অফলাইন মোড কাজ করার জন্য)।
 // ==========================================================
 
-const CACHE_NAME = "minbar-assistant-v25";
+const CACHE_NAME = "minbar-assistant-v28";
 const PRECACHE_URLS = [
   "/manifest.json",
   "/css/styles.css",
   "/js/supabase-client.js",
+  "/js/i18n.js",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
+  "/pages/dashboard.html",
+  "/pages/bayan-list.html",
+  "/pages/bayan-form.html",
+  "/pages/dawat-list.html",
+  "/pages/dawat-form.html",
+  "/pages/customers-list.html",
+  "/pages/customer-form.html",
+  "/pages/finance-list.html",
+  "/pages/finance-form.html",
+  "/pages/settings.html",
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS).catch(() => {}))
   );
   self.skipWaiting();
 });
@@ -33,10 +44,18 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return; // Supabase/CDN কল ইন্টারসেপ্ট করব না
 
-  // HTML পেজ — কখনো ক্যাশ থেকে না, সবসময় নেটওয়ার্ক থেকে সরাসরি (স্টেল কনটেন্ট এড়াতে)
+  // HTML পেজ — নেটওয়ার্ক আগে (সবসময় সর্বশেষ কনটেন্ট), ব্যর্থ হলে (অফলাইন) ক্যাশ থেকে
   const isHtml = event.request.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
   if (isHtml) {
-    event.respondWith(fetch(event.request, { cache: "no-store" }));
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || caches.match("/pages/dashboard.html")))
+    );
     return;
   }
 

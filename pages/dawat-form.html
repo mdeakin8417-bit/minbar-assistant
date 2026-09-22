@@ -107,7 +107,7 @@
       btn.disabled = true;
       btn.querySelector(".btn-label").textContent = "সংরক্ষণ হচ্ছে...";
 
-      const { error } = await db.from("dawats").insert({
+      const dawatPayload = {
         institution_id: institutionId,
         host_name: hostName,
         host_phone: document.getElementById("hostPhone").value.trim() || null,
@@ -116,7 +116,17 @@
         reminder_minutes_before: parseInt(document.getElementById("reminderBefore").value, 10),
         note: document.getElementById("note").value.trim() || null,
         created_by: currentUser.id,
-      });
+      };
+
+      // নেট না থাকলে লোকালি জমা রেখে পরে অটো-সিঙ্ক করা হবে
+      if (!navigator.onLine) {
+        queueOfflineWrite("dawats", dawatPayload);
+        await showAppAlert("নেট নেই — দাওয়াতটি ফোনে সংরক্ষণ হয়েছে, নেট এলে অটো আপলোড হয়ে যাবে।", "📶");
+        window.location.href = "dawat-list.html";
+        return;
+      }
+
+      const { error } = await db.from("dawats").insert(dawatPayload);
 
       if (error) {
         btn.disabled = false;

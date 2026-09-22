@@ -71,30 +71,52 @@
         .eq("institution_id", institutionId)
         .order("name");
 
-      if (error) { showConnectionError("কাস্টমারের তথ্য লোড করা যায়নি।"); return; }
+      let rows;
+      if (error || !navigator.onLine) {
+        rows = getCachedListData("customers_" + institutionId) || [];
+      } else {
+        const { data: txs } = await db
+          .from("customer_transactions")
+          .select("customer_id, type, amount")
+          .eq("institution_id", institutionId);
 
-      const { data: txs } = await db
-        .from("customer_transactions")
-        .select("customer_id, type, amount")
-        .eq("institution_id", institutionId);
+        const balances = {};
+        (txs || []).forEach((t) => {
+          balances[t.customer_id] = (balances[t.customer_id] || 0) + (t.type === "due" ? Number(t.amount) : -Number(t.amount));
+        });
 
-      const balances = {};
-      (txs || []).forEach((t) => {
-        balances[t.customer_id] = (balances[t.customer_id] || 0) + (t.type === "due" ? Number(t.amount) : -Number(t.amount));
-      });
+        rows = (customers || []).map((c) => ({ id: c.id, name: c.name, phone: c.phone, balance: balances[c.id] || 0 }));
+        cacheListData("customers_" + institutionId, rows);
+      }
+
+      // এখনো সিঙ্ক না হওয়া নতুন গ্রাহক তালিকায় যোগ করা
+      const pending = getPendingOfflineItems("customers", institutionId).map((q) => ({
+        id: q.local_id, name: q.payload.name, phone: q.payload.phone, balance: null, _pending: true,
+      }));
+      rows = [...pending, ...rows];
 
       const listEl = document.getElementById("custList");
       const emptyEl = document.getElementById("emptyState");
-      if (!customers || customers.length === 0) {
+      if (!rows || rows.length === 0) {
         listEl.innerHTML = "";
         emptyEl.style.display = "block";
         return;
       }
       emptyEl.style.display = "none";
 
-      listEl.innerHTML = customers
+      listEl.innerHTML = rows
         .map((c) => {
-          const bal = balances[c.id] || 0;
+          if (c._pending) {
+            return `
+          <div class="card cust-card" style="opacity:0.75;">
+            <div>
+              <h3 style="margin:0 0 2px;">${escapeHtml(c.name)}</h3>
+              <p class="small muted" style="margin:0;">${escapeHtml(c.phone || "")}</p>
+            </div>
+            <div class="due-amt" style="color:var(--ink-muted);">⏳ সিঙ্ক হয়নি</div>
+          </div>`;
+          }
+          const bal = c.balance || 0;
           const cls = bal > 0 ? "owes" : "clear";
           const label = bal > 0 ? formatMoney(bal) + " বাকি" : "পরিশোধিত";
           return `

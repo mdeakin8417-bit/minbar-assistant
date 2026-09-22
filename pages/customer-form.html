@@ -70,12 +70,21 @@
       btn.disabled = true;
       btn.querySelector(".btn-label").textContent = "সংরক্ষণ হচ্ছে...";
 
-      const { error } = await db.from("customers").insert({
+      const custPayload = {
         institution_id: institutionId,
         name,
         phone: document.getElementById("custPhone").value.trim() || null,
         address: document.getElementById("custAddress").value.trim() || null,
-      });
+      };
+
+      if (!navigator.onLine) {
+        queueOfflineWrite("customers", custPayload);
+        await showAppAlert("নেট নেই — গ্রাহক ফোনে সংরক্ষণ হয়েছে, নেট এলে অটো আপলোড হয়ে যাবে।", "📶");
+        window.location.href = "customers-list.html";
+        return;
+      }
+
+      const { error } = await db.from("customers").insert(custPayload);
 
       if (error) {
         btn.disabled = false;

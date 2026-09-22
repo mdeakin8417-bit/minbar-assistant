@@ -18,6 +18,67 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 // অ্যাপ ফাউন্ডার/এডমিন — এই ইউজার সবসময় সব প্রিমিয়াম ফিচার (AI ইত্যাদি) বিনামূল্যে পাবে
 const ADMIN_USER_ID = "8581fa4f-c7d7-4b02-a63e-c9c2b8a6eabb";
 
+// ---------- অফলাইন মোড: নেট না থাকলে নতুন এন্ট্রি লোকালি জমা থাকবে, নেট এলে অটো-সিঙ্ক ----------
+const OFFLINE_QUEUE_KEY = "minbar_offline_queue";
+
+function getOfflineQueue() {
+  try { return JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || "[]"); } catch (e) { return []; }
+}
+
+// table: যে Supabase টেবিলে insert হবে, payload: সেই রেকর্ডের ডেটা
+function queueOfflineWrite(table, payload) {
+  const queue = getOfflineQueue();
+  const item = { local_id: "offline_" + Date.now() + "_" + Math.random().toString(36).slice(2), table, payload };
+  queue.push(item);
+  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+  return item;
+}
+
+function getPendingOfflineItems(table, institutionId) {
+  return getOfflineQueue().filter((q) => q.table === table && (!institutionId || q.payload.institution_id === institutionId));
+}
+
+// নেট ফিরে এলে সাথে সাথে (এবং পেজ খোলার সময়ও) সব জমে থাকা এন্ট্রি Supabase-এ পাঠানোর চেষ্টা
+async function flushOfflineQueue() {
+  if (!navigator.onLine) return { synced: 0, failed: 0 };
+  const queue = getOfflineQueue();
+  if (queue.length === 0) return { synced: 0, failed: 0 };
+  const remaining = [];
+  let synced = 0;
+  for (const item of queue) {
+    try {
+      const { error } = await db.from(item.table).insert(item.payload);
+      if (error) remaining.push(item);
+      else synced++;
+    } catch (e) {
+      remaining.push(item);
+    }
+  }
+  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(remaining));
+  return { synced, failed: remaining.length };
+}
+
+window.addEventListener("online", async () => {
+  const result = await flushOfflineQueue();
+  if (result.synced > 0 && typeof showAppAlert === "function") {
+    showAppAlert(result.synced + "টা অফলাইন এন্ট্রি সিঙ্ক হয়ে গেছে ✅", "☁️");
+  }
+});
+if (navigator.onLine) flushOfflineQueue();
+
+// ---------- লিস্ট পেজের সর্বশেষ ডেটা লোকালি ক্যাশ — অফলাইনে শেষবার দেখা তালিকা দেখানোর জন্য ----------
+function cacheListData(key, data) {
+  try { localStorage.setItem("minbar_cache_" + key, JSON.stringify(data)); } catch (e) {}
+}
+function getCachedListData(key) {
+  try {
+    const raw = localStorage.getItem("minbar_cache_" + key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 // বর্তমান ইউজার/প্রতিষ্ঠানের জন্য AI সহকারী চালু আছে কিনা — এডমিন সবসময় true পাবে,
 // বাকিদের জন্য প্রতিষ্ঠানের ai_enabled ফ্ল্যাগ চেক হবে (এডমিন প্যানেল থেকে ম্যানুয়ালি চালু করা হয়)
 async function isAiEnabled() {

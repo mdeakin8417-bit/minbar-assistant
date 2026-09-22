@@ -192,19 +192,31 @@
       btn.disabled = true;
       btn.querySelector(".btn-label").textContent = "সংরক্ষণ হচ্ছে...";
 
-      const { data: tx, error } = await db
-        .from("transactions")
-        .insert({
-          institution_id: institutionId,
-          category_id: categoryId,
-          type: txType,
-          amount,
-          description: document.getElementById("description").value.trim() || null,
-          transaction_date: document.getElementById("txDate").value || new Date().toISOString().slice(0, 10),
-          created_by: currentUser.id,
-        })
-        .select()
-        .single();
+      const txPayload = {
+        institution_id: institutionId,
+        category_id: categoryId,
+        type: txType,
+        amount,
+        description: document.getElementById("description").value.trim() || null,
+        transaction_date: document.getElementById("txDate").value || new Date().toISOString().slice(0, 10),
+        created_by: currentUser.id,
+      };
+
+      const file = document.getElementById("attachment").files[0];
+
+      // নেট না থাকলে লোকালি জমা রাখা হবে — অ্যাটাচমেন্ট (ছবি/ফাইল) অফলাইনে আপলোড করা যাবে না,
+      // তাই নেট এলে এন্ট্রি সিঙ্ক হওয়ার পর দরকার হলে ফাইলটা আলাদাভাবে যোগ করে দিতে হবে
+      if (!navigator.onLine) {
+        queueOfflineWrite("transactions", txPayload);
+        await showAppAlert(
+          "নেট নেই — লেনদেন ফোনে সংরক্ষণ হয়েছে, নেট এলে অটো আপলোড হয়ে যাবে।" + (file ? " (অ্যাটাচমেন্ট ফাইলটি অফলাইনে যোগ করা যায়নি, নেট এলে আলাদাভাবে যোগ করুন)" : ""),
+          "📶"
+        );
+        window.location.href = "finance-list.html";
+        return;
+      }
+
+      const { data: tx, error } = await db.from("transactions").insert(txPayload).select().single();
 
       if (error) {
         btn.disabled = false;
@@ -213,7 +225,6 @@
         return;
       }
 
-      const file = document.getElementById("attachment").files[0];
       if (file) {
         const path = institutionId + "/" + tx.id + "/" + Date.now() + "_" + file.name;
         const { error: uploadError } = await db.storage.from("finance-attachments").upload(path, file);

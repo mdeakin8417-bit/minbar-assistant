@@ -134,8 +134,16 @@
       emptyEl.style.display = "none";
 
       listEl.innerHTML = filtered
-        .map(
-          (d) => `
+        .map((d) =>
+          d._pending
+            ? `
+        <div class="card dawat-card" style="opacity:0.75;">
+          <span class="status-badge" style="background:var(--surface-sunken); color:var(--ink-muted);">⏳ সিঙ্ক হয়নি</span>
+          <h3>${escapeHtml(d.host_name)}</h3>
+          <p class="small muted" style="margin:0;">🕐 ${escapeHtml(formatDateTime(d.dawat_datetime))}</p>
+          ${d.address ? `<p class="small muted" style="margin:2px 0 0;">📍 ${escapeHtml(d.address)}</p>` : ""}
+        </div>`
+            : `
         <div class="card dawat-card" onclick="window.location.href='dawat-detail.html?id=${d.id}'">
           <span class="status-badge status-${d.status}">${statusLabels[d.status]}</span>
           <h3>${escapeHtml(d.host_name)}</h3>
@@ -155,6 +163,19 @@
       });
     });
 
+    // নেট আসার আগ পর্যন্ত ফোনে জমা থাকা (এখনো সিঙ্ক না হওয়া) দাওয়াতগুলো তালিকায় যোগ করা
+    function appendPendingOffline() {
+      const pending = getPendingOfflineItems("dawats", institutionId).map((q) => ({
+        id: q.local_id,
+        host_name: q.payload.host_name,
+        address: q.payload.address,
+        dawat_datetime: q.payload.dawat_datetime,
+        status: "upcoming",
+        _pending: true,
+      }));
+      allDawats = [...pending, ...allDawats];
+    }
+
     async function loadDawats() {
       const { data, error } = await db
         .from("dawats")
@@ -162,11 +183,15 @@
         .eq("institution_id", institutionId)
         .order("dawat_datetime", { ascending: true });
 
-      if (error) {
-        document.getElementById("emptyState").style.display = "block";
+      if (error || !navigator.onLine) {
+        allDawats = getCachedListData("dawats_" + institutionId) || [];
+        appendPendingOffline();
+        renderList();
         return;
       }
       allDawats = data || [];
+      cacheListData("dawats_" + institutionId, allDawats);
+      appendPendingOffline();
       renderList();
     }
 

@@ -221,16 +221,30 @@
       btn.disabled = true;
       btn.querySelector(".btn-label").textContent = "সংরক্ষণ হচ্ছে...";
 
+      const bayanPayload = {
+        institution_id: institutionId,
+        category_id: categoryId,
+        title,
+        content,
+        bayan_date: bayanDate,
+        created_by: currentUser.id,
+      };
+
+      // নেট না থাকলে শুধু লেখা অংশটা লোকালি জমা রাখা হবে — ছবি/ভিডিও/লিংক অফলাইনে যোগ করা যাবে না,
+      // নেট এলে বায়ানটা সিঙ্ক হয়ে যাবে, তারপর মিডিয়া আলাদাভাবে যোগ করে নিতে হবে
+      if (!navigator.onLine) {
+        queueOfflineWrite("bayans", bayanPayload);
+        await showAppAlert(
+          "নেট নেই — বায়ানের লেখা ফোনে সংরক্ষণ হয়েছে, নেট এলে অটো আপলোড হয়ে যাবে।" + (file || mediaLink ? " (ছবি/ভিডিও/লিংক অফলাইনে যোগ করা যায়নি, নেট এলে আলাদাভাবে যোগ করুন)" : ""),
+          "📶"
+        );
+        window.location.href = "bayan-list.html";
+        return;
+      }
+
       const { data: bayan, error } = await db
         .from("bayans")
-        .insert({
-          institution_id: institutionId,
-          category_id: categoryId,
-          title,
-          content,
-          bayan_date: bayanDate,
-          created_by: currentUser.id,
-        })
+        .insert(bayanPayload)
         .select()
         .single();
 
