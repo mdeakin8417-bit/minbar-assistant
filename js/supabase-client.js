@@ -25,10 +25,17 @@ function getOfflineQueue() {
   try { return JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || "[]"); } catch (e) { return []; }
 }
 
+function generateClientId() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "cid_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+}
+
 // table: যে Supabase টেবিলে insert হবে, payload: সেই রেকর্ডের ডেটা
 function queueOfflineWrite(table, payload) {
   const queue = getOfflineQueue();
-  const item = { local_id: "offline_" + Date.now() + "_" + Math.random().toString(36).slice(2), table, payload };
+  // client_id দেওয়া থাকছে — নেট এসে সিঙ্ক হওয়ার সময় এই একই রেকর্ড দুইবার insert না হয়ে upsert হবে
+  const payloadWithClientId = { ...payload, client_id: generateClientId() };
+  const item = { local_id: "offline_" + Date.now() + "_" + Math.random().toString(36).slice(2), table, payload: payloadWithClientId };
   queue.push(item);
   localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
   return item;
@@ -47,7 +54,8 @@ async function flushOfflineQueue() {
   let synced = 0;
   for (const item of queue) {
     try {
-      const { error } = await db.from(item.table).insert(item.payload);
+      // insert-এর বদলে upsert — client_id মিলে গেলে (আগেই সিঙ্ক হয়ে থাকলে) নতুন করে ডুপ্লিকেট রেকর্ড তৈরি হবে না
+      const { error } = await db.from(item.table).upsert(item.payload, { onConflict: "client_id" });
       if (error) remaining.push(item);
       else synced++;
     } catch (e) {
