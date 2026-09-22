@@ -79,16 +79,16 @@
           </div>
 
           <div class="field">
-            <label data-i18n="mediaFile">ছবি / PDF ফাইল যুক্ত করুন (ঐচ্ছিক)</label>
+            <label data-i18n="mediaFile">PDF ফাইল যুক্ত করুন (ঐচ্ছিক)</label>
             <div class="file-drop" id="fileDrop" onclick="document.getElementById('mediaFile').click();">
               📎 ফাইল বাছাই করতে চাপুন
             </div>
             <input type="file" id="mediaFile" accept="image/*,application/pdf,video/*" style="display:none;" />
             <p class="small lang-bn" style="margin-top:6px; color:var(--gold-700);">
-              🎬 প্রিমিয়াম নিলে সরাসরি ভিডিও ফাইলও যুক্ত করতে পারবেন — <a href="video-premium.html" style="color:var(--gold-700); font-weight:600;">বিস্তারিত দেখুন</a>
+              🎬 প্রিমিয়াম নিলে সরাসরি ছবি/ভিডিও ফাইলও যুক্ত করতে পারবেন — <a href="video-premium.html" style="color:var(--gold-700); font-weight:600;">বিস্তারিত দেখুন</a>
             </p>
             <p class="small lang-en" style="margin-top:6px; color:var(--gold-700); display:none;">
-              🎬 With Premium, you can attach video files directly — <a href="video-premium.html" style="color:var(--gold-700); font-weight:600;">Learn more</a>
+              🎬 With Premium, you can attach image/video files directly — <a href="video-premium.html" style="color:var(--gold-700); font-weight:600;">Learn more</a>
             </p>
           </div>
 
@@ -123,12 +123,16 @@
       const file = e.target.files[0];
       if (!file) return;
 
-      if (file.type.startsWith("video/")) {
+      if (file.type.startsWith("video/") || file.type.startsWith("image/")) {
+        const isVideo = file.type.startsWith("video/");
         const fileMb = file.size / (1024 * 1024);
         if (videoQuotaMb <= 0) {
           e.target.value = "";
           await showAppAlert(
-            "সরাসরি ভিডিও ফাইল আপলোড একটি প্রিমিয়াম ফিচার। এর বদলে উপরে ইউটিউব/ফেসবুক লিংক ব্যবহার করুন (ফ্রি), অথবা ভিডিও প্যাকেজ নিন।",
+            (isVideo ? "সরাসরি ভিডিও" : "সরাসরি ছবি") +
+              " ফাইল আপলোড একটি প্রিমিয়াম ফিচার। " +
+              (isVideo ? "এর বদলে উপরে ইউটিউব/ফেসবুক লিংক ব্যবহার করুন (ফ্রি), অথবা" : "") +
+              " স্টোরেজ প্যাকেজ নিন।",
             "🎬"
           );
           setTimeout(() => { window.location.href = "video-premium.html"; }, 1800);
@@ -138,7 +142,7 @@
           e.target.value = "";
           const remaining = Math.max(0, videoQuotaMb - videoUsedMb).toFixed(0);
           await showAppAlert(
-            "আপনার ভিডিও কোটা শেষের পথে — মাত্র " + remaining + " এমবি অবশিষ্ট আছে। প্যাকেজ বাড়াতে হবে।",
+            "আপনার স্টোরেজ কোটা শেষের পথে — মাত্র " + remaining + " এমবি অবশিষ্ট আছে। প্যাকেজ বাড়াতে হবে।",
             "⚠️"
           );
           return;
@@ -260,13 +264,13 @@
         const path = institutionId + "/" + bayan.id + "/" + Date.now() + "_" + file.name;
         const { error: uploadError } = await db.storage.from("bayan-media").upload(path, file);
         if (!uploadError) {
-          const { data: publicUrlData } = db.storage.from("bayan-media").getPublicUrl(path);
+          // প্রাইভেট বাকেট — পাবলিক URL না, শুধু path সংরক্ষণ করা হচ্ছে; দেখানোর সময় সাইনড URL বানানো হবে
           await db.from("bayan_media").insert({
             bayan_id: bayan.id,
             media_type: mediaType,
-            file_url: publicUrlData.publicUrl,
+            file_url: path,
           });
-          if (mediaType === "video") {
+          if (mediaType === "video" || mediaType === "image") {
             const fileMb = Math.ceil(file.size / (1024 * 1024));
             await db.from("institutions").update({ video_used_mb: videoUsedMb + fileMb }).eq("id", institutionId);
           }
