@@ -50,6 +50,7 @@
           <div class="field" id="dateField">
             <label for="dawatDate" data-i18n="dateTime">তারিখ ও সময়</label>
             <input type="datetime-local" id="dawatDate" required />
+            <p class="small muted" id="dayNameHint" style="margin:4px 0 0;"></p>
             <div class="field-error">তারিখ ও সময় দিন</div>
           </div>
 
@@ -82,6 +83,17 @@
   <script src="../js/supabase-client.js"></script>
   <script>
     applyTranslations();
+
+    const WEEKDAYS_BN = ["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
+    const dawatDateInput = document.getElementById("dawatDate");
+    const dayNameHint = document.getElementById("dayNameHint");
+    function updateDayNameHint() {
+      if (!dawatDateInput.value) { dayNameHint.textContent = ""; return; }
+      const d = new Date(dawatDateInput.value);
+      dayNameHint.textContent = isNaN(d) ? "" : "📅 " + WEEKDAYS_BN[d.getDay()];
+    }
+    dawatDateInput.addEventListener("input", updateDayNameHint);
+    dawatDateInput.addEventListener("change", updateDayNameHint);
     let institutionId = null;
     let currentUser = null;
 
