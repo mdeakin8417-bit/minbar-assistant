@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — লক করা আছে</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    body { background: var(--teal-800); }
+    .lock-shell { min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; color:var(--parchment); max-width:480px; margin:0 auto; }
+    .lock-icon { width:72px; height:72px; border-radius:22px; margin-bottom:16px; }
+    .lock-shell h2 { color: var(--parchment); }
+    .pin-dots { display:flex; justify-content:center; gap:14px; margin: 20px 0 26px; }
+    .pin-dots span { width:16px; height:16px; border-radius:50%; border:2px solid rgba(250,246,239,0.4); }
+    .pin-dots span.filled { background: var(--gold-500); border-color: var(--gold-500); }
+    .keypad { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; max-width:280px; }
+    .keypad button {
+      aspect-ratio:1; border-radius:50%; border:1.5px solid rgba(250,246,239,0.25); background:rgba(250,246,239,0.08);
+      font-size:22px; font-weight:600; color:var(--parchment); cursor:pointer;
+    }
+    .keypad button:active { background: rgba(250,246,239,0.18); }
+    .keypad .empty { visibility:hidden; }
+
+    .pattern-wrap { position:relative; }
+    .pattern-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width:240px; margin: 20px auto; touch-action:none; }
+    .pattern-dot { width:22px; height:22px; border-radius:50%; border:2.5px solid rgba(250,246,239,0.4); margin:0 auto; position:relative; z-index:2; }
+    .pattern-dot.active { background: var(--gold-500); border-color: var(--gold-500); }
+    #patternSvg { position:absolute; top:0; left:0; pointer-events:none; z-index:1; }
+
+    .bio-btn {
+      display:flex; align-items:center; gap:10px; background: rgba(250,246,239,0.1); border:1.5px solid rgba(250,246,239,0.25);
+      color: var(--parchment); padding: 12px 22px; border-radius: var(--radius-pill); font-size:15px; font-weight:600;
+      cursor:pointer; margin-bottom: 22px;
+    }
+    .error-msg { color:#F2B8A8; font-size:13.5px; min-height:18px; margin-bottom:6px; }
+  </style>
+</head>
+<body>
+  <div class="lock-shell">
+    <img src="../icons/icon-192.png" class="lock-icon" alt="" />
+    <h2 id="lockTitle" data-i18n="lockedTitle">লক করা আছে</h2>
+    <p style="opacity:0.75; margin-top:-4px;" id="lockSubtitle">আনলক করতে PIN দিন</p>
+
+    <button class="bio-btn" id="bioBtn" style="display:none;">🔐 ফিঙ্গারপ্রিন্ট/ফেস দিয়ে আনলক করুন</button>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div id="pinSection">
+      <div class="pin-dots" id="pinDots"></div>
+      <div class="keypad" id="pinKeypad"></div>
+    </div>
+
+    <div id="patternSection" style="display:none;">
+      <div class="pattern-wrap">
+        <svg id="patternSvg" width="240" height="240"><polyline id="patternLine" points="" stroke="var(--gold-500)" stroke-width="3" fill="none" /></svg>
+        <div class="pattern-grid" id="patternGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/i18n.js"></script>
+  <script>
+    applyTranslations();
+    const method = localStorage.getItem("minbar_lock_method") || "pin";
+    const storedHash = localStorage.getItem("minbar_lock_pin_hash");
+    const params = new URLSearchParams(window.location.search);
+    const redirectTo = params.get("redirect") || "dashboard.html";
+
+    async function sha256Hex(text) {
+      const enc = new TextEncoder().encode(text);
+      const hashBuf = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(hashBuf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function unlockSuccess() {
+      sessionStorage.setItem("minbar_unlocked", "1");
+      window.location.replace(redirectTo);
+    }
+
+    function showError(msg) {
+      document.getElementById("errorMsg").textContent = msg;
+      setTimeout(() => (document.getElementById("errorMsg").textContent = ""), 2000);
+    }
+
+    // ---------- বায়োমেট্রিক ----------
+    const credId = localStorage.getItem("minbar_biometric_credential_id");
+    if (credId && window.PublicKeyCredential) {
+      document.getElementById("bioBtn").style.display = "flex";
+    }
+    document.getElementById("bioBtn").addEventListener("click", async () => {
+      try {
+        const rawId = Uint8Array.from(atob(credId), (c) => c.charCodeAt(0));
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        const assertion = await navigator.credentials.get({
+          publicKey: { challenge, allowCredentials: [{ id: rawId, type: "public-key" }], userVerification: "required", timeout: 60000 },
+        });
+        if (assertion) unlockSuccess();
+      } catch (e) {
+        showError("বায়োমেট্রিক যাচাই ব্যর্থ হয়েছে, PIN/প্যাটার্ন ব্যবহার করুন।");
+      }
+    });
+    // পেজ খোলার সাথে সাথে বায়োমেট্রিক প্রম্পট অটো-চেষ্টা
+    if (credId && window.PublicKeyCredential) {
+      setTimeout(() => document.getElementById("bioBtn").click(), 400);
+    }
+
+    // ---------- PIN ----------
+    let pinBuffer = "";
+    if (method === "pin") {
+      document.getElementById("lockSubtitle").textContent = t("enterPinSubtitle");
+      const keypad = document.getElementById("pinKeypad");
+      ["1","2","3","4","5","6","7","8","9","","0","⌫"].forEach((k) => {
+        const btn = document.createElement("button");
+        if (k === "") btn.className = "empty";
+        btn.type = "button";
+        btn.textContent = k;
+        btn.addEventListener("click", () => handleKey(k));
+        keypad.appendChild(btn);
+      });
+      renderPinDots();
+    } else {
+      document.getElementById("pinSection").style.display = "none";
+      document.getElementById("patternSection").style.display = "block";
+      document.getElementById("lockSubtitle").textContent = t("enterPatternSubtitle");
+      setupPatternGrid();
+    }
+
+    function renderPinDots() {
+      const dotsEl = document.getElementById("pinDots");
+      dotsEl.innerHTML = "";
+      for (let i = 0; i < 4; i++) {
+        const dot = document.createElement("span");
+        if (i < pinBuffer.length) dot.classList.add("filled");
+        dotsEl.appendChild(dot);
+      }
+    }
+
+    async function handleKey(k) {
+      if (k === "") return;
+      if (k === "⌫") { pinBuffer = pinBuffer.slice(0, -1); renderPinDots(); return; }
+      if (pinBuffer.length >= 4) return;
+      pinBuffer += k;
+      renderPinDots();
+      if (pinBuffer.length === 4) {
+        const hash = await sha256Hex("pin:" + pinBuffer);
+        if (hash === storedHash) {
+          unlockSuccess();
+        } else {
+          showError("ভুল PIN, আবার চেষ্টা করুন।");
+          pinBuffer = "";
+          setTimeout(renderPinDots, 150);
+        }
+      }
+    }
+
+    // ---------- প্যাটার্ন ----------
+    function setupPatternGrid() {
+      const patternGrid = document.getElementById("patternGrid");
+      for (let i = 0; i < 9; i++) {
+        const dot = document.createElement("div");
+        dot.className = "pattern-dot";
+        patternGrid.appendChild(dot);
+      }
+      let currentPattern = [];
+      let isDrawing = false;
+
+      function getDotCenters() {
+        return Array.from(document.querySelectorAll(".pattern-dot")).map((d) => {
+          const r = d.getBoundingClientRect();
+          const wrapR = document.querySelector(".pattern-wrap").getBoundingClientRect();
+          return { x: r.left - wrapR.left + r.width / 2, y: r.top - wrapR.top + r.height / 2 };
+        });
+      }
+      function resetPattern() {
+        currentPattern = [];
+        document.querySelectorAll(".pattern-dot").forEach((d) => d.classList.remove("active"));
+        document.getElementById("patternLine").setAttribute("points", "");
+      }
+      function addDot(index, centers) {
+        if (currentPattern.includes(index)) return;
+        currentPattern.push(index);
+        document.querySelectorAll(".pattern-dot")[index].classList.add("active");
+        document.getElementById("patternLine").setAttribute("points", currentPattern.map((i) => centers[i].x + "," + centers[i].y).join(" "));
+      }
+      function onMove(e) {
+        if (!isDrawing) return;
+        const touch = e.touches ? e.touches[0] : e;
+        const centers = getDotCenters();
+        document.querySelectorAll(".pattern-dot").forEach((dot, i) => {
+          const rect = dot.getBoundingClientRect();
+          const dx = touch.clientX - (rect.left + rect.width / 2);
+          const dy = touch.clientY - (rect.top + rect.height / 2);
+          if (Math.sqrt(dx * dx + dy * dy) < 24) addDot(i, centers);
+        });
+      }
+      async function onUp() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        const patternStr = currentPattern.join("-");
+        const hash = await sha256Hex("pattern:" + patternStr);
+        if (hash === storedHash) {
+          unlockSuccess();
+        } else {
+          showError("ভুল প্যাটার্ন, আবার চেষ্টা করুন।");
+          resetPattern();
+        }
+      }
+      patternGrid.addEventListener("pointerdown", (e) => { isDrawing = true; onMove(e); });
+      document.addEventListener("pointermove", onMove);
+      document.addEventListener("pointerup", onUp);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — সার্চ</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .back-btn-wrap { display:flex; gap:10px; align-items:center; margin-bottom:6px; }
+    .search-box {
+      display:flex; align-items:center; gap:8px; background: var(--surface); border:1.5px solid var(--border-strong);
+      border-radius: var(--radius-pill); padding: 10px 16px; margin: -18px 0 var(--space-4);
+    }
+    .search-box input { flex:1; border:none; outline:none; background:transparent; font-size:15px; color: var(--ink); font-family:inherit; }
+    .result-section { margin-bottom: var(--space-5); }
+    .result-section h4 { font-size:13px; color: var(--teal-800); margin: 0 0 8px; }
+    .result-row {
+      display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--border); cursor:pointer;
+    }
+    .result-row:last-child { border-bottom:none; }
+    .result-row .title { font-weight:600; font-size:14.5px; }
+    .result-row .sub { font-size:12px; color: var(--ink-muted); margin-top:1px; }
+    .result-row .amt { font-weight:700; font-size:14px; }
+    .empty-hint { text-align:center; color: var(--ink-muted); padding: 40px 20px; font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row back-btn-wrap">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <h1 style="margin:0;">🔍 সার্চ মিনবার</h1>
+      </div>
+      <p>বায়ান, দাওয়াত, গ্রাহক, হিসাব — সব একসাথে খুঁজুন</p>
+    </header>
+
+    <main class="screen">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" id="searchInput" placeholder="নাম, শিরোনাম বা বিবরণ লিখুন..." autofocus />
+      </div>
+
+      <div id="results"></div>
+      <div class="empty-hint" id="emptyHint">খোঁজার জন্য উপরে লিখুন</div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let institutionId = null;
+    let debounceTimer = null;
+
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.textContent = str || "";
+      return d.innerHTML;
+    }
+    function formatMoney(n) { return "৳" + Number(n || 0).toLocaleString("en-BD"); }
+
+    async function runSearch(q) {
+      const resultsEl = document.getElementById("results");
+      const emptyHint = document.getElementById("emptyHint");
+      if (!q || q.trim().length < 2) {
+        resultsEl.innerHTML = "";
+        emptyHint.style.display = "block";
+        emptyHint.textContent = "খোঁজার জন্য উপরে লিখুন";
+        return;
+      }
+      emptyHint.style.display = "none";
+      const like = "%" + q.trim() + "%";
+
+      const [bayans, dawats, customers, txs] = await Promise.all([
+        db.from("bayans").select("id, title, bayan_date").eq("institution_id", institutionId).ilike("title", like).limit(5),
+        db.from("dawats").select("id, host_name, dawat_datetime").eq("institution_id", institutionId).ilike("host_name", like).limit(5),
+        db.from("customers").select("id, name, phone").eq("institution_id", institutionId).ilike("name", like).limit(5),
+        db.from("transactions").select("id, description, amount, type").eq("institution_id", institutionId).ilike("description", like).limit(5),
+      ]);
+
+      const sections = [];
+
+      if (bayans.data && bayans.data.length > 0) {
+        sections.push(`
+          <div class="result-section">
+            <h4>📖 বায়ান (${bayans.data.length})</h4>
+            ${bayans.data.map((b) => `
+              <div class="result-row" onclick="window.location.href='bayan-detail.html?id=${b.id}'">
+                <div><div class="title">${escapeHtml(b.title)}</div></div>
+              </div>`).join("")}
+          </div>`);
+      }
+      if (dawats.data && dawats.data.length > 0) {
+        sections.push(`
+          <div class="result-section">
+            <h4>🍽️ দাওয়াত (${dawats.data.length})</h4>
+            ${dawats.data.map((d) => `
+              <div class="result-row" onclick="window.location.href='dawat-detail.html?id=${d.id}'">
+                <div><div class="title">${escapeHtml(d.host_name)}</div><div class="sub">${new Date(d.dawat_datetime).toLocaleDateString("bn-BD")}</div></div>
+              </div>`).join("")}
+          </div>`);
+      }
+      if (customers.data && customers.data.length > 0) {
+        sections.push(`
+          <div class="result-section">
+            <h4>👤 গ্রাহক (${customers.data.length})</h4>
+            ${customers.data.map((c) => `
+              <div class="result-row" onclick="window.location.href='customer-detail.html?id=${c.id}'">
+                <div><div class="title">${escapeHtml(c.name)}</div><div class="sub">${escapeHtml(c.phone || "")}</div></div>
+              </div>`).join("")}
+          </div>`);
+      }
+      if (txs.data && txs.data.length > 0) {
+        sections.push(`
+          <div class="result-section">
+            <h4>💰 হিসাব (${txs.data.length})</h4>
+            ${txs.data.map((t) => `
+              <div class="result-row" onclick="window.location.href='finance-detail.html?id=${t.id}'">
+                <div><div class="title">${escapeHtml(t.description || "লেনদেন")}</div></div>
+                <div class="amt" style="color:${t.type === "income" ? "var(--income)" : "var(--expense)"};">${t.type === "income" ? "+" : "-"}${formatMoney(t.amount)}</div>
+              </div>`).join("")}
+          </div>`);
+      }
+
+      if (sections.length === 0) {
+        resultsEl.innerHTML = "";
+        emptyHint.style.display = "block";
+        emptyHint.textContent = "কিছু পাওয়া যায়নি";
+        return;
+      }
+      resultsEl.innerHTML = sections.join("");
+    }
+
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      clearTimeout(debounceTimer);
+      const q = e.target.value;
+      debounceTimer = setTimeout(() => runSearch(q), 300);
+    });
+
+    (async () => {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+      const inst = await getCurrentInstitution();
+      if (inst.status !== "ok") return;
+      institutionId = inst.id;
+    })();
+  </script>
+</body>
+</html>
