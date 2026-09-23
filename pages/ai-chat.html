@@ -51,6 +51,12 @@
       display:inline-block; margin: 4px; padding: 8px 14px; border-radius: var(--radius-pill);
       background: var(--surface); border: 1.5px solid var(--border-strong); font-size: 13px; cursor:pointer;
     }
+    .mode-row { display:flex; gap:6px; padding: 10px 12px 0; flex-shrink:0; background: var(--teal-800); }
+    .mode-chip {
+      flex:1; text-align:center; padding:7px 4px; border-radius: var(--radius-pill); font-size:12px; font-weight:600;
+      background: rgba(250,246,239,0.12); color: var(--parchment); cursor:pointer; opacity:0.75;
+    }
+    .mode-chip.active { background: var(--gold-600); color: var(--teal-900); opacity:1; }
   </style>
 </head>
 <body>
@@ -62,15 +68,14 @@
       <h1 data-i18n="aiChatTitle">🤖 AI সহকারী</h1>
     </div>
 
+    <div class="mode-row">
+      <div class="mode-chip active" data-mode="imam" onclick="switchMode('imam')">🕌 ইমাম সহকারী</div>
+      <div class="mode-chip" data-mode="bayan" onclick="switchMode('bayan')">📖 বায়ান সহকারী</div>
+      <div class="mode-chip" data-mode="qa" onclick="switchMode('qa')">❓ ইসলামিক প্রশ্নোত্তর</div>
+    </div>
+
     <div class="chat-body" id="chatBody">
-      <div class="empty-hint" id="emptyHint">
-        <div style="font-size:36px; margin-bottom:8px;">🤖</div>
-        <p data-i18n="aiChatGreeting">আসসালামু আলাইকুম! আমি আপনাকে বায়ান লেখা, ইসলামিক প্রশ্নোত্তর, বা হিসাব-দাওয়াত সংক্রান্ত পরামর্শে সাহায্য করতে পারি।</p>
-        <div style="margin-top:10px;">
-          <span class="suggestion-chip" onclick="sendSuggestion(this)" data-i18n="aiSuggestion1">জুমার বায়ানের একটা বিষয় সাজেস্ট করো</span>
-          <span class="suggestion-chip" onclick="sendSuggestion(this)" data-i18n="aiSuggestion2">সবরের ওপর একটা ছোট বায়ানের খসড়া লিখে দাও</span>
-        </div>
-      </div>
+      <div class="empty-hint" id="emptyHint"></div>
     </div>
 
     <div class="chat-input-bar">
@@ -86,6 +91,42 @@
     applyTranslations();
     let conversationId = null;
     let institutionId = null;
+    let currentMode = "imam";
+
+    const MODE_CONTENT = {
+      imam: {
+        greeting: "আসসালামু আলাইকুম! আমি আপনার দৈনন্দিন কাজে সাহায্য করতে পারি — আজকের দাওয়াত, এই মাসের হিসাব, বা যেকোনো পরামর্শ জিজ্ঞেস করুন।",
+        suggestions: ["আজ আমার কী কী কাজ আছে?", "এই মাসের হিসাব কেমন যাচ্ছে?"],
+      },
+      bayan: {
+        greeting: "বায়ান লেখায় সাহায্য দরকার? বিষয় বলুন — কুরআন-হাদিসের রেফারেন্সসহ একটা কাঠামো বানিয়ে দেব। আপনার আগের বায়ানের ধরন মাথায় রেখেই লিখব।",
+        suggestions: ["জুমার বায়ানের একটা বিষয় সাজেস্ট করো", "সবরের ওপর একটা ছোট বায়ানের খসড়া লিখে দাও"],
+      },
+      qa: {
+        greeting: "ইসলামিক যেকোনো প্রশ্ন করুন — দলিলসহ উত্তর দেওয়ার চেষ্টা করব, আর যেখানে ফিকহি মতভেদ আছে সেটাও জানিয়ে দেব। জটিল মাসয়ালায় স্থানীয় আলেমের সাথে যাচাই করে নেবেন।",
+        suggestions: ["রোজা অবস্থায় ভুলে কিছু খেয়ে ফেললে কী হবে?", "যাকাতের নিসাব কীভাবে ঠিক হয়?"],
+      },
+    };
+
+    function renderEmptyHint() {
+      const m = MODE_CONTENT[currentMode];
+      document.getElementById("emptyHint").innerHTML = `
+        <div style="font-size:36px; margin-bottom:8px;">🤖</div>
+        <p>${m.greeting}</p>
+        <div style="margin-top:10px;">
+          ${m.suggestions.map((s) => `<span class="suggestion-chip" onclick="sendSuggestion(this)">${s}</span>`).join("")}
+        </div>`;
+      document.getElementById("emptyHint").style.display = "block";
+    }
+
+    function switchMode(mode) {
+      if (mode === currentMode) return;
+      currentMode = mode;
+      conversationId = null; // মোড বদলালে নতুন কথোপকথন শুরু হবে, যাতে সিস্টেম নির্দেশনা মিশে না যায়
+      document.querySelectorAll(".mode-chip").forEach((c) => c.classList.toggle("active", c.dataset.mode === mode));
+      document.getElementById("chatBody").innerHTML = '<div class="empty-hint" id="emptyHint"></div>';
+      renderEmptyHint();
+    }
 
     function escapeHtml(str) {
       const d = document.createElement("div");
@@ -127,7 +168,7 @@
 
       try {
         const { data, error } = await db.functions.invoke("ai-chat", {
-          body: { message: text, conversationId, institutionId },
+          body: { message: text, conversationId, institutionId, mode: currentMode },
         });
 
         removeTypingIndicator();
@@ -175,6 +216,7 @@
       if (!aiOn) { window.location.replace("ai-premium.html"); return; }
       const inst = await getCurrentInstitution();
       if (inst.status === "ok") institutionId = inst.id;
+      renderEmptyHint();
     })();
   </script>
 </body>
