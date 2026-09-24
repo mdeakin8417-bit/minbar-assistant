@@ -35,9 +35,9 @@
           <button class="back-btn" onclick="window.location.href='dashboard.html'">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           </button>
-          <h1 style="margin:0;">🔔 নোটিফিকেশন</h1>
+          <h1 style="margin:0;" data-i18n="notifTitle">🔔 নোটিফিকেশন</h1>
         </div>
-        <button class="mark-all" onclick="markAllRead()">সব পড়া হয়েছে</button>
+        <button class="mark-all" onclick="markAllRead()" data-i18n="notifMarkAll">সব পড়া হয়েছে</button>
       </div>
     </header>
 
@@ -60,12 +60,12 @@
     }
     function timeAgo(dateStr) {
       const diffMin = Math.round((Date.now() - new Date(dateStr).getTime()) / 60000);
-      if (diffMin < 1) return "এখনই";
-      if (diffMin < 60) return diffMin + " মিনিট আগে";
+      if (diffMin < 1) return t("notifJustNow");
+      if (diffMin < 60) return diffMin + t("notifMinAgo");
       const diffH = Math.round(diffMin / 60);
-      if (diffH < 24) return diffH + " ঘণ্টা আগে";
+      if (diffH < 24) return diffH + t("notifHourAgo");
       const diffD = Math.round(diffH / 24);
-      return diffD + " দিন আগে";
+      return diffD + t("notifDayAgo");
     }
     const ICONS = { dawat: "🍽️", prayer: "🕌", islamic_date: "🌙" };
 
@@ -85,7 +85,7 @@
 
       const listEl = document.getElementById("notifList");
       if (error || !data || data.length === 0) {
-        listEl.innerHTML = '<p class="muted small text-center" style="padding:20px 0;">এখনো কোনো নোটিফিকেশন নেই।</p>';
+        listEl.innerHTML = '<p class="muted small text-center" style="padding:20px 0;">' + t("notifEmpty") + "</p>";
         return;
       }
 

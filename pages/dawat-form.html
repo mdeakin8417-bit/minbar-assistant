@@ -84,7 +84,9 @@
   <script>
     applyTranslations();
 
-    const WEEKDAYS_BN = ["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
+    const WEEKDAYS_BN = getLang() === "en"
+      ? ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+      : ["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"];
     const dawatDateInput = document.getElementById("dawatDate");
     const dayNameHint = document.getElementById("dayNameHint");
     function updateDayNameHint() {

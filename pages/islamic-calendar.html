@@ -38,9 +38,9 @@
         <button class="back-btn" onclick="window.location.href='settings.html'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
-        <h1 style="margin:0;">ইসলামিক ক্যালেন্ডার</h1>
+        <h1 style="margin:0;" data-i18n="islCalTitle">ইসলামিক ক্যালেন্ডার</h1>
       </div>
-      <p>আজকের হিজরি তারিখ ও আসন্ন গুরুত্বপূর্ণ দিন</p>
+      <p data-i18n="islCalSubtitle">আজকের হিজরি তারিখ ও আসন্ন গুরুত্বপূর্ণ দিন</p>
     </header>
 
     <main class="screen" style="margin-top:-24px;">
@@ -50,16 +50,16 @@
       </div>
 
       <div class="card" style="box-shadow: var(--shadow-raised);">
-        <h3 style="margin-top:0;">আসন্ন গুরুত্বপূর্ণ দিন</h3>
+        <h3 style="margin-top:0;" data-i18n="islCalUpcoming">আসন্ন গুরুত্বপূর্ণ দিন</h3>
         <div id="eventList"></div>
-        <p class="small muted" style="margin-top:10px;">"সম্ভাব্য" লেখা তারিখগুলো গাণিতিক হিসাবে বের করা — চাঁদ দেখার ওপর নির্ভর করে বাস্তবে ১ দিন আগে-পিছে হতে পারে।</p>
+        <p class="small muted" style="margin-top:10px;" data-i18n="islCalNote">"সম্ভাব্য" লেখা তারিখগুলো গাণিতিক হিসাবে বের করা — চাঁদ দেখার ওপর নির্ভর করে বাস্তবে ১ দিন আগে-পিছে হতে পারে।</p>
       </div>
 
       <div class="card" style="box-shadow: var(--shadow-raised); margin-top:16px;">
         <div class="reminder-row">
           <div>
-            <b>রিমাইন্ডার নোটিফিকেশন</b>
-            <p class="small muted" style="margin:2px 0 0;">গুরুত্বপূর্ণ দিনের ৩ দিন আগে পুশ নোটিফিকেশন পাবেন</p>
+            <b data-i18n="islCalReminderTitle">রিমাইন্ডার নোটিফিকেশন</b>
+            <p class="small muted" style="margin:2px 0 0;" data-i18n="islCalReminderSub">গুরুত্বপূর্ণ দিনের ৩ দিন আগে পুশ নোটিফিকেশন পাবেন</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="reminderToggle" />
@@ -77,29 +77,47 @@
     applyTranslations();
     let institutionId = null;
 
-    const HIJRI_MONTHS_BN_LOCAL = HIJRI_MONTHS_BN;
+    const HIJRI_MONTHS_EN = ["Muharram","Safar","Rabi al-Awwal","Rabi al-Thani","Jumada al-Awwal","Jumada al-Thani","Rajab","Shaban","Ramadan","Shawwal","Dhul-Qadah","Dhul-Hijjah"];
+    const GREG_MONTHS_BN = ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+    const GREG_MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    // hijri.js-এর বাংলা নামের সাথে মিলিয়ে ইংরেজি অনুবাদ (আইকন দিয়ে হুবহু, নাম দিয়ে লুকআপ)
+    const EVENT_NAME_EN = {
+      "হিজরি নববর্ষ": "Islamic New Year",
+      "আশুরা": "Ashura",
+      "ঈদে মিলাদুন্নবী (সম্ভাব্য)": "Eid Milad-un-Nabi (estimated)",
+      "শবে বরাত": "Shab-e-Barat",
+      "রমজান শুরু (সম্ভাব্য)": "Ramadan start (estimated)",
+      "ঈদুল ফিতর (সম্ভাব্য)": "Eid-ul-Fitr (estimated)",
+      "আরাফাহ দিবস (সম্ভাব্য)": "Day of Arafah (estimated)",
+      "ঈদুল আযহা (সম্ভাব্য)": "Eid-ul-Adha (estimated)",
+    };
+
     const banglaDigits = { 0: "০", 1: "১", 2: "২", 3: "৩", 4: "৪", 5: "৫", 6: "৬", 7: "৭", 8: "৮", 9: "৯" };
     function toBn(n) { return String(n).replace(/[0-9]/g, (d) => banglaDigits[d]); }
-    const GREG_MONTHS_BN = ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+    function fmtNum(n) { return getLang() === "en" ? String(n) : toBn(n); }
+    function monthName(i) { return getLang() === "en" ? GREG_MONTHS_EN[i] : GREG_MONTHS_BN[i]; }
+    function hijriMonthName(i) { return getLang() === "en" ? HIJRI_MONTHS_EN[i] : HIJRI_MONTHS_BN[i]; }
+    function eventName(bnName) { return getLang() === "en" ? EVENT_NAME_EN[bnName] || bnName : bnName; }
 
     function renderToday() {
       const h = todayHijri();
-      document.getElementById("todayHijri").textContent = toBn(h.day) + " " + HIJRI_MONTHS_BN_LOCAL[h.month - 1] + ", " + toBn(h.year) + " হিজরি";
+      const hijriSuffix = getLang() === "en" ? " AH" : " হিজরি";
+      document.getElementById("todayHijri").textContent = fmtNum(h.day) + " " + hijriMonthName(h.month - 1) + ", " + fmtNum(h.year) + hijriSuffix;
       const g = new Date();
-      document.getElementById("todayGreg").textContent = g.getDate() + " " + GREG_MONTHS_BN[g.getMonth()] + ", " + g.getFullYear();
+      document.getElementById("todayGreg").textContent = g.getDate() + " " + monthName(g.getMonth()) + ", " + g.getFullYear();
     }
 
     function renderEvents() {
       const events = getUpcomingIslamicDates(6);
       document.getElementById("eventList").innerHTML = events
         .map((ev) => {
-          const label = ev.daysLeft === 0 ? "আজ" : ev.daysLeft === 1 ? "আগামীকাল" : toBn(ev.daysLeft) + " দিন বাকি";
+          const label = ev.daysLeft === 0 ? t("islCalToday") : ev.daysLeft === 1 ? t("islCalTomorrow") : fmtNum(ev.daysLeft) + " " + t("islCalDaysLeft");
           return `
         <div class="event-row">
           <span class="icon">${ev.icon}</span>
           <div style="flex:1;">
-            <h4>${ev.name}</h4>
-            <p>${ev.date.getDate()} ${GREG_MONTHS_BN[ev.date.getMonth()]}, ${ev.date.getFullYear()}</p>
+            <h4>${eventName(ev.name)}</h4>
+            <p>${ev.date.getDate()} ${monthName(ev.date.getMonth())}, ${ev.date.getFullYear()}</p>
           </div>
           <div class="days-badge">${label}</div>
         </div>`;
@@ -123,11 +141,11 @@
         const { error } = await db.from("institutions").update({ islamic_reminders_enabled: toggle.checked }).eq("id", institutionId);
         if (error) {
           toggle.checked = !toggle.checked;
-          await showAppAlert("পরিবর্তন করা যায়নি: " + error.message, "⚠️");
+          await showAppAlert(t("islCalToggleError") + error.message, "⚠️");
           return;
         }
         if (toggle.checked && (await isPushSubscribed()) === false) {
-          await showAppAlert("রিমাইন্ডার পেতে সেটিংস পেজ থেকে পুশ নোটিফিকেশনও চালু করে নিন।", "🔔");
+          await showAppAlert(t("islCalEnablePushHint"), "🔔");
         }
       });
     })();

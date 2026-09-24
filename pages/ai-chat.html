@@ -69,9 +69,9 @@
     </div>
 
     <div class="mode-row">
-      <div class="mode-chip active" data-mode="imam" onclick="switchMode('imam')">🕌 ইমাম সহকারী</div>
-      <div class="mode-chip" data-mode="bayan" onclick="switchMode('bayan')">📖 বায়ান সহকারী</div>
-      <div class="mode-chip" data-mode="qa" onclick="switchMode('qa')">❓ ইসলামিক প্রশ্নোত্তর</div>
+      <div class="mode-chip active" data-mode="imam" onclick="switchMode('imam')" data-i18n="aiModeImam">🕌 ইমাম সহকারী</div>
+      <div class="mode-chip" data-mode="bayan" onclick="switchMode('bayan')" data-i18n="aiModeBayan">📖 বায়ান সহকারী</div>
+      <div class="mode-chip" data-mode="qa" onclick="switchMode('qa')" data-i18n="aiModeQa">❓ ইসলামিক প্রশ্নোত্তর</div>
     </div>
 
     <div class="chat-body" id="chatBody">
@@ -95,26 +95,45 @@
 
     const MODE_CONTENT = {
       imam: {
-        greeting: "আসসালামু আলাইকুম! আমি আপনার দৈনন্দিন কাজে সাহায্য করতে পারি — আজকের দাওয়াত, এই মাসের হিসাব, বা যেকোনো পরামর্শ জিজ্ঞেস করুন।",
-        suggestions: ["আজ আমার কী কী কাজ আছে?", "এই মাসের হিসাব কেমন যাচ্ছে?"],
+        greeting: {
+          bn: "আসসালামু আলাইকুম! আমি আপনার দৈনন্দিন কাজে সাহায্য করতে পারি — আজকের দাওয়াত, এই মাসের হিসাব, বা যেকোনো পরামর্শ জিজ্ঞেস করুন।",
+          en: "Assalamu Alaikum! I can help with your day-to-day tasks — ask about today's Dawats, this month's finances, or anything else.",
+        },
+        suggestions: {
+          bn: ["আজ আমার কী কী কাজ আছে?", "এই মাসের হিসাব কেমন যাচ্ছে?"],
+          en: ["What's on my plate today?", "How are this month's finances looking?"],
+        },
       },
       bayan: {
-        greeting: "বায়ান লেখায় সাহায্য দরকার? বিষয় বলুন — কুরআন-হাদিসের রেফারেন্সসহ একটা কাঠামো বানিয়ে দেব। আপনার আগের বায়ানের ধরন মাথায় রেখেই লিখব।",
-        suggestions: ["জুমার বায়ানের একটা বিষয় সাজেস্ট করো", "সবরের ওপর একটা ছোট বায়ানের খসড়া লিখে দাও"],
+        greeting: {
+          bn: "বায়ান লেখায় সাহায্য দরকার? বিষয় বলুন — কুরআন-হাদিসের রেফারেন্সসহ একটা কাঠামো বানিয়ে দেব। আপনার আগের বায়ানের ধরন মাথায় রেখেই লিখব।",
+          en: "Need help writing a Bayan? Give me a topic and I'll build a structure with Quran/Hadith references, keeping your usual style in mind.",
+        },
+        suggestions: {
+          bn: ["জুমার বায়ানের একটা বিষয় সাজেস্ট করো", "সবরের ওপর একটা ছোট বায়ানের খসড়া লিখে দাও"],
+          en: ["Suggest a topic for a Jumma Bayan", "Draft a short Bayan on patience (sabr)"],
+        },
       },
       qa: {
-        greeting: "ইসলামিক যেকোনো প্রশ্ন করুন — দলিলসহ উত্তর দেওয়ার চেষ্টা করব, আর যেখানে ফিকহি মতভেদ আছে সেটাও জানিয়ে দেব। জটিল মাসয়ালায় স্থানীয় আলেমের সাথে যাচাই করে নেবেন।",
-        suggestions: ["রোজা অবস্থায় ভুলে কিছু খেয়ে ফেললে কী হবে?", "যাকাতের নিসাব কীভাবে ঠিক হয়?"],
+        greeting: {
+          bn: "ইসলামিক যেকোনো প্রশ্ন করুন — দলিলসহ উত্তর দেওয়ার চেষ্টা করব, আর যেখানে ফিকহি মতভেদ আছে সেটাও জানিয়ে দেব। জটিল মাসয়ালায় স্থানীয় আলেমের সাথে যাচাই করে নেবেন।",
+          en: "Ask any Islamic question — I'll try to answer with evidence, and flag where scholars differ. For complex matters, please verify with a local scholar.",
+        },
+        suggestions: {
+          bn: ["রোজা অবস্থায় ভুলে কিছু খেয়ে ফেললে কী হবে?", "যাকাতের নিসাব কীভাবে ঠিক হয়?"],
+          en: ["What if I accidentally eat while fasting?", "How is the Zakat Nisab determined?"],
+        },
       },
     };
 
     function renderEmptyHint() {
+      const lang = getLang() === "en" ? "en" : "bn";
       const m = MODE_CONTENT[currentMode];
       document.getElementById("emptyHint").innerHTML = `
         <div style="font-size:36px; margin-bottom:8px;">🤖</div>
-        <p>${m.greeting}</p>
+        <p>${m.greeting[lang]}</p>
         <div style="margin-top:10px;">
-          ${m.suggestions.map((s) => `<span class="suggestion-chip" onclick="sendSuggestion(this)">${s}</span>`).join("")}
+          ${m.suggestions[lang].map((s) => `<span class="suggestion-chip" onclick="sendSuggestion(this)">${s}</span>`).join("")}
         </div>`;
       document.getElementById("emptyHint").style.display = "block";
     }

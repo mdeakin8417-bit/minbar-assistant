@@ -88,6 +88,64 @@ const translations = {
     privacyTagline: "আপনার তথ্যের নিরাপত্তা আমাদের অগ্রাধিকার", termsTagline: "অ্যাপ ব্যবহারের নিয়মাবলী", aiTagline: "আপনার ব্যক্তিগত ইসলামিক সহকারী", videoStorageRow: "মিডিয়া স্টোরেজ প্যাকেজ",
     aiChatTitle: "🤖 AI সহকারী", aiChatGreeting: "আসসালামু আলাইকুম! আমি আপনাকে বায়ান লেখা, ইসলামিক প্রশ্নোত্তর, বা হিসাব-দাওয়াত সংক্রান্ত পরামর্শে সাহায্য করতে পারি।",
     aiSuggestion1: "জুমার বায়ানের একটা বিষয় সাজেস্ট করো", aiSuggestion2: "সবরের ওপর একটা ছোট বায়ানের খসড়া লিখে দাও", aiChatPlaceholder: "আপনার প্রশ্ন লিখুন...",
+    aiModeImam: "🕌 ইমাম সহকারী", aiModeBayan: "📖 বায়ান সহকারী", aiModeQa: "❓ ইসলামিক প্রশ্নোত্তর",
+
+    // সার্চ
+    searchTitle: "🔍 সার্চ মিনবার", searchSubtitle: "বায়ান, দাওয়াত, গ্রাহক, হিসাব — সব একসাথে খুঁজুন",
+    searchPlaceholder: "নাম, শিরোনাম বা বিবরণ লিখুন...", searchEmptyPrompt: "খোঁজার জন্য উপরে লিখুন", searchNoResults: "কিছু পাওয়া যায়নি",
+    searchSectionBayan: "📖 বায়ান", searchSectionDawat: "🍽️ দাওয়াত", searchSectionCustomer: "👤 গ্রাহক", searchSectionFinance: "💰 হিসাব", searchTxFallback: "লেনদেন",
+
+    // যাকাত ক্যালকুলেটর
+    zakatTitle: "যাকাত ক্যালকুলেটর", zakatSubtitle: "আপনার সম্পদের হিসাব দিন, যাকাত হিসাব করে দেব",
+    zakatNisabHint: "নিসাব হিসাবের মানদণ্ড বেছে নিন — রূপা-ভিত্তিক নিসাব কম, তাই এতে বেশি মানুষের ওপর যাকাত ফরজ হয় (সতর্কতামূলক); স্বর্ণ-ভিত্তিক নিসাব বেশি।",
+    zakatNisabSilver: "রূপা-ভিত্তিক নিসাব (৫৯৫ গ্রাম)", zakatNisabGold: "স্বর্ণ-ভিত্তিক নিসাব (৮৫ গ্রাম)",
+    zakatSectionCash: "💰 নগদ ও পাওনা", zakatCash: "হাতে/ব্যাংকে নগদ টাকা", zakatReceivable: "মানুষের কাছে পাওনা (ফেরত পাবেন এমন)", zakatBusiness: "ব্যবসায়িক পণ্য/মালামালের মূল্য",
+    zakatSectionGold: "🥇 স্বর্ণ", zakatGoldGrams: "স্বর্ণের পরিমাণ (গ্রাম)", zakatPricePerGram: "প্রতি গ্রাম দাম (৳)",
+    zakatSectionSilver: "🥈 রূপা", zakatSilverGrams: "রূপার পরিমাণ (গ্রাম)",
+    zakatSectionDebt: "📉 ঋণ/দেনা", zakatDebt: "আপনার নিজের ঋণ (যা শোধ করতে হবে)",
+    zakatCalcBtn: "হিসাব করুন", zakatFootnote: "এটি একটি সাধারণ হিসাব-সহায়ক টুল, নির্দিষ্ট মাসয়ালার জন্য স্থানীয় আলেমের পরামর্শ নিন।",
+    zakatNeedPrice: "নিসাব হিসাব করতে প্রতি গ্রাম দাম দিন।", zakatDue: "আপনার ওপর যাকাত ফরজ", zakatNotDue: "যাকাত ফরজ নয়",
+    zakatOfWealth: "(মোট সম্পদের আড়াই শতাংশ)", zakatBelowNisab: "আপনার মোট সম্পদ নিসাব সীমার নিচে",
+    zakatTotalAssets: "মোট সম্পদ", zakatNisabLimit: "নিসাব সীমা",
+
+    // ইসলামিক ক্যালেন্ডার
+    islCalTitle: "ইসলামিক ক্যালেন্ডার", islCalSubtitle: "আজকের হিজরি তারিখ ও আসন্ন গুরুত্বপূর্ণ দিন",
+    islCalUpcoming: "আসন্ন গুরুত্বপূর্ণ দিন", islCalNote: "\"সম্ভাব্য\" লেখা তারিখগুলো গাণিতিক হিসাবে বের করা — চাঁদ দেখার ওপর নির্ভর করে বাস্তবে ১ দিন আগে-পিছে হতে পারে।",
+    islCalReminderTitle: "রিমাইন্ডার নোটিফিকেশন", islCalReminderSub: "গুরুত্বপূর্ণ দিনের ৩ দিন আগে পুশ নোটিফিকেশন পাবেন",
+    islCalToday: "আজ", islCalTomorrow: "আগামীকাল", islCalDaysLeft: "দিন বাকি",
+    islCalToggleError: "পরিবর্তন করা যায়নি: ", islCalEnablePushHint: "রিমাইন্ডার পেতে সেটিংস পেজ থেকে পুশ নোটিফিকেশনও চালু করে নিন।",
+
+    // টিম সদস্য
+    teamTitle: "টিম সদস্য", teamSubtitle: "এই প্রতিষ্ঠানে কারা যুক্ত আছে",
+    teamAddTitle: "নতুন সদস্য যোগ করুন", teamAddHint: "যাকে যোগ করতে চান তাকে আগে অ্যাপে অ্যাকাউন্ট খুলে তার প্রোফাইলে ফোন নম্বর দিতে বলুন, তারপর সেই নম্বর দিয়ে এখানে খুঁজুন।",
+    teamPhonePlaceholder: "01XXXXXXXXX", teamAddBtn: "যোগ করুন", teamYou: " (আপনি)",
+    teamRoleOwner: "👑 মালিক", teamRoleAdmin: "অ্যাডমিন", teamRoleImam: "ইমাম", teamRoleAccountant: "হিসাবরক্ষক", teamRoleViewer: "দর্শক",
+    teamPermAdmin: "রোল বদলাতে ড্রপডাউনে ট্যাপ করুন। ভূমিকাগুলো এখন শুধু পরিচিতির জন্য — প্রতিটা ফিচারে আলাদা অনুমতি এখনো প্রযোজ্য নয়।",
+    teamPermViewer: "শুধু মালিক/অ্যাডমিন সদস্য যোগ বা অপসারণ করতে পারবেন।",
+    teamEnterPhone: "ফোন নম্বর দিন।", teamUserNotFound: "এই নম্বরে কোনো অ্যাকাউন্ট পাওয়া যায়নি। আগে তাকে অ্যাপে সাইন আপ করে প্রোফাইলে নম্বর দিতে বলুন।",
+    teamConfirmAdd: "-কে ", teamConfirmAddAs: " হিসেবে যোগ করবেন?", teamDupUser: "এই ইউজার আগে থেকেই টিমে আছেন।",
+    teamAddFailed: "যোগ করা যায়নি: ", teamAdded: "যোগ হয়েছে ✅", teamChangeFailed: "পরিবর্তন করা যায়নি: ",
+    teamConfirmRemove: "-কে টিম থেকে সরিয়ে দেবেন?", teamRemoveFailed: "সরানো যায়নি: ",
+
+    // ব্যাকআপ ও রিস্টোর
+    backupTitle: "ব্যাকআপ ও রিস্টোর", backupSubtitle: "আপনার ডেটা নিরাপদে রাখুন, ফোন বদলালেও ফিরিয়ে আনুন",
+    backupExportTitle: "📤 ব্যাকআপ নিন", backupExportHint: "এই প্রতিষ্ঠানের বায়ান, দাওয়াত, গ্রাহক ও হিসাবের সব লেখা-ডেটা একটা ফাইলে জমা করবে।",
+    backupExportBtn: "ব্যাকআপ ফাইল ডাউনলোড করুন", backupNoMedia: "⚠️ ছবি/ভিডিও ফাইল এই ব্যাকআপে থাকবে না, শুধু লেখা ডেটা থাকবে।",
+    backupImportTitle: "📥 রিস্টোর করুন", backupImportHint: "আগের নেওয়া ব্যাকআপ ফাইল থেকে ডেটা এই প্রতিষ্ঠানে ফিরিয়ে আনবে। আগের ডেটা মুছবে না, নতুন করে যোগ হবে।",
+    backupFileHint: "📎 ব্যাকআপ ফাইল (.json) বাছাই করতে চাপুন",
+    backupGenerating: "তৈরি হচ্ছে...", backupNotValidFile: "এটা Minbar Assistant-এর ব্যাকআপ ফাইল বলে মনে হচ্ছে না।",
+    backupFileReadError: "ফাইলটি পড়া যায়নি — সঠিক ব্যাকআপ ফাইল কিনা দেখুন।", backupRestoring: "রিস্টোর হচ্ছে...",
+    backupCountBayan: "বায়ান", backupCountDawat: "দাওয়াত", backupCountCustomer: "গ্রাহক",
+    backupCountCustomerTx: "গ্রাহকের লেনদেন", backupCountFinanceTx: "হিসাবের লেনদেন", backupFailedLabel: "ব্যর্থ",
+    backupRestoreComplete: "রিস্টোর সম্পন্ন ✅",
+
+    // নোটিফিকেশন সেন্টার
+    notifTitle: "🔔 নোটিফিকেশন", notifMarkAll: "সব পড়া হয়েছে", notifEmpty: "এখনো কোনো নোটিফিকেশন নেই।",
+    notifJustNow: "এখনই", notifMinAgo: " মিনিট আগে", notifHourAgo: " ঘণ্টা আগে", notifDayAgo: " দিন আগে",
+
+    // ড্যাশবোর্ড সামারি কার্ড
+    monthBalanceLabel: "এই মাসের ব্যালেন্স", monthDeficit: " (ঘাটতি)", hijriSuffix: " হি.",
+    dawatViewList: "📋 লিস্ট", dawatViewCalendar: "🗓️ ক্যালেন্ডার", dawatCalNoDawat: "এই দিনে কোনো দাওয়াত নেই।", weekdaySuffix: "বার",
   },
   en: {
     save: "Save", saving: "Saving...", cancel: "Cancel", delete: "Delete",
@@ -157,6 +215,64 @@ const translations = {
     privacyTagline: "Your data security is our priority", termsTagline: "App usage guidelines", aiTagline: "Your personal Islamic assistant", videoStorageRow: "Media Storage Package",
     aiChatTitle: "🤖 AI Assistant", aiChatGreeting: "Assalamu Alaikum! I can help you write Bayans, answer Islamic questions, or advise on finance and Dawat matters.",
     aiSuggestion1: "Suggest a topic for a Jumma Bayan", aiSuggestion2: "Draft a short Bayan on patience (sabr)", aiChatPlaceholder: "Type your question...",
+    aiModeImam: "🕌 Imam Assistant", aiModeBayan: "📖 Bayan Assistant", aiModeQa: "❓ Islamic Q&A",
+
+    // Search
+    searchTitle: "🔍 Search Minbar", searchSubtitle: "Search Bayans, Dawats, customers and finance — all at once",
+    searchPlaceholder: "Type a name, title or description...", searchEmptyPrompt: "Type above to search", searchNoResults: "No results found",
+    searchSectionBayan: "📖 Bayan", searchSectionDawat: "🍽️ Dawat", searchSectionCustomer: "👤 Customers", searchSectionFinance: "💰 Finance", searchTxFallback: "Transaction",
+
+    // Zakat calculator
+    zakatTitle: "Zakat Calculator", zakatSubtitle: "Enter your assets and we'll calculate your Zakat",
+    zakatNisabHint: "Choose your Nisab standard — the silver-based Nisab is lower, so more people become liable for Zakat under it (a precautionary choice); the gold-based Nisab is higher.",
+    zakatNisabSilver: "Silver-based Nisab (595g)", zakatNisabGold: "Gold-based Nisab (85g)",
+    zakatSectionCash: "💰 Cash & Receivables", zakatCash: "Cash in hand/bank", zakatReceivable: "Money owed to you by others", zakatBusiness: "Value of business goods/inventory",
+    zakatSectionGold: "🥇 Gold", zakatGoldGrams: "Gold amount (grams)", zakatPricePerGram: "Price per gram (৳)",
+    zakatSectionSilver: "🥈 Silver", zakatSilverGrams: "Silver amount (grams)",
+    zakatSectionDebt: "📉 Debt", zakatDebt: "Your own debt (to be repaid)",
+    zakatCalcBtn: "Calculate", zakatFootnote: "This is a general calculation aid — consult a local scholar for specific rulings.",
+    zakatNeedPrice: "Enter the price per gram to calculate Nisab.", zakatDue: "Zakat is obligatory on you", zakatNotDue: "Zakat is not obligatory",
+    zakatOfWealth: "(2.5% of total assets)", zakatBelowNisab: "Your total assets are below the Nisab threshold",
+    zakatTotalAssets: "Total assets", zakatNisabLimit: "Nisab threshold",
+
+    // Islamic calendar
+    islCalTitle: "Islamic Calendar", islCalSubtitle: "Today's Hijri date and upcoming important days",
+    islCalUpcoming: "Upcoming important days", islCalNote: "Dates marked \"estimated\" are calculated mathematically — actual moon-sighting dates may differ by a day.",
+    islCalReminderTitle: "Reminder notifications", islCalReminderSub: "Get a push notification 3 days before important days",
+    islCalToday: "Today", islCalTomorrow: "Tomorrow", islCalDaysLeft: "days left",
+    islCalToggleError: "Could not update: ", islCalEnablePushHint: "Also turn on push notifications in Settings to receive reminders.",
+
+    // Team members
+    teamTitle: "Team Members", teamSubtitle: "Who's part of this institution",
+    teamAddTitle: "Add a new member", teamAddHint: "Ask the person to sign up in the app and add their phone number to their profile first, then look them up here by that number.",
+    teamPhonePlaceholder: "01XXXXXXXXX", teamAddBtn: "Add", teamYou: " (You)",
+    teamRoleOwner: "👑 Owner", teamRoleAdmin: "Admin", teamRoleImam: "Imam", teamRoleAccountant: "Accountant", teamRoleViewer: "Viewer",
+    teamPermAdmin: "Tap the dropdown to change a role. Roles are for identification only for now — per-feature permissions aren't enforced yet.",
+    teamPermViewer: "Only the owner/admin can add or remove members.",
+    teamEnterPhone: "Enter a phone number.", teamUserNotFound: "No account found for this number. Ask them to sign up in the app and add it to their profile first.",
+    teamConfirmAdd: " as ", teamConfirmAddAs: "?", teamDupUser: "This user is already on the team.",
+    teamAddFailed: "Could not add: ", teamAdded: "Added ✅", teamChangeFailed: "Could not update: ",
+    teamConfirmRemove: " from the team?", teamRemoveFailed: "Could not remove: ",
+
+    // Backup & restore
+    backupTitle: "Backup & Restore", backupSubtitle: "Keep your data safe, and bring it back even on a new phone",
+    backupExportTitle: "📤 Take a backup", backupExportHint: "Saves all this institution's Bayan, Dawat, customer, and finance text data into one file.",
+    backupExportBtn: "Download backup file", backupNoMedia: "⚠️ Images/videos are not included in this backup — only text data.",
+    backupImportTitle: "📥 Restore", backupImportHint: "Brings data from a previous backup file back into this institution. Existing data won't be deleted — this only adds.",
+    backupFileHint: "📎 Tap to choose a backup file (.json)",
+    backupGenerating: "Preparing...", backupNotValidFile: "This doesn't look like a Minbar Assistant backup file.",
+    backupFileReadError: "Couldn't read the file — check that it's a valid backup file.", backupRestoring: "Restoring...",
+    backupCountBayan: "Bayans", backupCountDawat: "Dawats", backupCountCustomer: "Customers",
+    backupCountCustomerTx: "Customer transactions", backupCountFinanceTx: "Finance transactions", backupFailedLabel: "Failed",
+    backupRestoreComplete: "Restore complete ✅",
+
+    // Notification center
+    notifTitle: "🔔 Notifications", notifMarkAll: "Mark all read", notifEmpty: "No notifications yet.",
+    notifJustNow: "Just now", notifMinAgo: " min ago", notifHourAgo: " hr ago", notifDayAgo: " days ago",
+
+    // Dashboard summary card
+    monthBalanceLabel: "This month's balance", monthDeficit: " (deficit)", hijriSuffix: " AH",
+    dawatViewList: "📋 List", dawatViewCalendar: "🗓️ Calendar", dawatCalNoDawat: "No Dawat on this day.", weekdaySuffix: "",
   },
 };
 

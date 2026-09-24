@@ -31,24 +31,24 @@
         <button class="back-btn" onclick="window.location.href='settings.html'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
-        <h1 style="margin:0;">ব্যাকআপ ও রিস্টোর</h1>
+        <h1 style="margin:0;" data-i18n="backupTitle">ব্যাকআপ ও রিস্টোর</h1>
       </div>
-      <p>আপনার ডেটা নিরাপদে রাখুন, ফোন বদলালেও ফিরিয়ে আনুন</p>
+      <p data-i18n="backupSubtitle">আপনার ডেটা নিরাপদে রাখুন, ফোন বদলালেও ফিরিয়ে আনুন</p>
     </header>
 
     <main class="screen" style="margin-top:-24px;">
       <div class="card" style="box-shadow: var(--shadow-raised);">
-        <h3 style="margin-top:0;">📤 ব্যাকআপ নিন</h3>
-        <p class="small muted">এই প্রতিষ্ঠানের বায়ান, দাওয়াত, গ্রাহক ও হিসাবের সব লেখা-ডেটা একটা ফাইলে জমা করবে।</p>
-        <button class="btn btn--primary" onclick="exportBackup()" id="exportBtn">ব্যাকআপ ফাইল ডাউনলোড করুন</button>
-        <p class="small muted" style="margin-top:8px;">⚠️ ছবি/ভিডিও ফাইল এই ব্যাকআপে থাকবে না, শুধু লেখা ডেটা থাকবে।</p>
+        <h3 style="margin-top:0;" data-i18n="backupExportTitle">📤 ব্যাকআপ নিন</h3>
+        <p class="small muted" data-i18n="backupExportHint">এই প্রতিষ্ঠানের বায়ান, দাওয়াত, গ্রাহক ও হিসাবের সব লেখা-ডেটা একটা ফাইলে জমা করবে।</p>
+        <button class="btn btn--primary" onclick="exportBackup()" id="exportBtn" data-i18n="backupExportBtn">ব্যাকআপ ফাইল ডাউনলোড করুন</button>
+        <p class="small muted" style="margin-top:8px;" data-i18n="backupNoMedia">⚠️ ছবি/ভিডিও ফাইল এই ব্যাকআপে থাকবে না, শুধু লেখা ডেটা থাকবে।</p>
       </div>
 
       <div class="card" style="box-shadow: var(--shadow-raised); margin-top:16px;">
-        <h3 style="margin-top:0;">📥 রিস্টোর করুন</h3>
-        <p class="small muted">আগের নেওয়া ব্যাকআপ ফাইল থেকে ডেটা এই প্রতিষ্ঠানে ফিরিয়ে আনবে। আগের ডেটা মুছবে না, নতুন করে যোগ হবে।</p>
+        <h3 style="margin-top:0;" data-i18n="backupImportTitle">📥 রিস্টোর করুন</h3>
+        <p class="small muted" data-i18n="backupImportHint">আগের নেওয়া ব্যাকআপ ফাইল থেকে ডেটা এই প্রতিষ্ঠানে ফিরিয়ে আনবে। আগের ডেটা মুছবে না, নতুন করে যোগ হবে।</p>
         <div class="file-drop" id="fileDrop" onclick="document.getElementById('restoreFile').click();">
-          📎 ব্যাকআপ ফাইল (.json) বাছাই করতে চাপুন
+          <span data-i18n="backupFileHint">📎 ব্যাকআপ ফাইল (.json) বাছাই করতে চাপুন</span>
         </div>
         <input type="file" id="restoreFile" accept="application/json" style="display:none;" onchange="handleFileSelect(event)" />
         <div id="restoreStatus"></div>
@@ -68,7 +68,7 @@
     async function exportBackup() {
       const btn = document.getElementById("exportBtn");
       btn.disabled = true;
-      btn.textContent = "তৈরি হচ্ছে...";
+      btn.textContent = t("backupGenerating");
 
       const [bCats, bayans, dawats, customers, custTx, fCats, txs] = await Promise.all([
         db.from("bayan_categories").select("name").eq("institution_id", institutionId),
@@ -142,7 +142,7 @@
       URL.revokeObjectURL(url);
 
       btn.disabled = false;
-      btn.textContent = "ব্যাকআপ ফাইল ডাউনলোড করুন";
+      btn.textContent = t("backupExportBtn");
     }
 
     function handleFileSelect(event) {
@@ -153,17 +153,18 @@
         try {
           const backup = JSON.parse(e.target.result);
           if (backup.app !== "minbar-assistant-backup") {
-            await showAppAlert("এটা Minbar Assistant-এর ব্যাকআপ ফাইল বলে মনে হচ্ছে না।", "⚠️");
+            await showAppAlert(t("backupNotValidFile"), "⚠️");
             return;
           }
-          const confirmed = await showAppConfirm(
-            "\"" + (backup.institution_name || "") + "\"-এর ব্যাকআপ থেকে ডেটা এই প্রতিষ্ঠানে যোগ করবেন? আগের ডেটা মুছবে না।",
-            "📥"
-          );
+          const instName = backup.institution_name || "";
+          const confirmMsg = getLang() === "en"
+            ? 'Add data from the "' + instName + '" backup to this institution? Existing data won\'t be deleted.'
+            : '"' + instName + '"-এর ব্যাকআপ থেকে ডেটা এই প্রতিষ্ঠানে যোগ করবেন? আগের ডেটা মুছবে না।';
+          const confirmed = await showAppConfirm(confirmMsg, "📥");
           if (!confirmed) return;
           await restoreBackup(backup);
         } catch (err) {
-          await showAppAlert("ফাইলটি পড়া যায়নি — সঠিক ব্যাকআপ ফাইল কিনা দেখুন।", "⚠️");
+          await showAppAlert(t("backupFileReadError"), "⚠️");
         }
       };
       reader.readAsText(file);
@@ -171,7 +172,7 @@
 
     async function restoreBackup(backup) {
       const statusEl = document.getElementById("restoreStatus");
-      statusEl.innerHTML = '<p class="muted small">রিস্টোর হচ্ছে...</p>';
+      statusEl.innerHTML = '<p class="muted small">' + t("backupRestoring") + '</p>';
       const counts = {};
 
       // ১) বায়ান ক্যাটাগরি — নাম মিলিয়ে থাকলে ব্যবহার, না থাকলে নতুন তৈরি
@@ -199,7 +200,7 @@
           created_by: currentUserId,
         }));
         const { data, error } = await db.from("bayans").upsert(payload, { onConflict: "client_id" }).select();
-        counts["বায়ান"] = error ? "ব্যর্থ" : (data || []).length;
+        counts[t("backupCountBayan")] = error ? t("backupFailedLabel") : (data || []).length;
       }
 
       // ৩) দাওয়াত
@@ -217,7 +218,7 @@
           created_by: currentUserId,
         }));
         const { data, error } = await db.from("dawats").upsert(payload, { onConflict: "client_id" }).select();
-        counts["দাওয়াত"] = error ? "ব্যর্থ" : (data || []).length;
+        counts[t("backupCountDawat")] = error ? t("backupFailedLabel") : (data || []).length;
       }
 
       // ৪) গ্রাহক (পরে customer_transactions-এ রেফারেন্সের জন্য নতুন id লাগবে, তাই select() করে ম্যাপ বানানো হচ্ছে)
@@ -231,7 +232,7 @@
           address: c.address,
         }));
         const { data, error } = await db.from("customers").upsert(payload, { onConflict: "client_id" }).select();
-        counts["গ্রাহক"] = error ? "ব্যর্থ" : (data || []).length;
+        counts[t("backupCountCustomer")] = error ? t("backupFailedLabel") : (data || []).length;
         (data || []).forEach((c) => (customerRefMap[c.client_id] = c.id));
       }
 
@@ -250,7 +251,7 @@
           }));
         if (payload.length > 0) {
           const { data, error } = await db.from("customer_transactions").upsert(payload, { onConflict: "client_id" }).select();
-          counts["গ্রাহকের লেনদেন"] = error ? "ব্যর্থ" : (data || []).length;
+          counts[t("backupCountCustomerTx")] = error ? t("backupFailedLabel") : (data || []).length;
         }
       }
 
@@ -280,11 +281,11 @@
           created_by: currentUserId,
         }));
         const { data, error } = await db.from("transactions").upsert(payload, { onConflict: "client_id" }).select();
-        counts["হিসাবের লেনদেন"] = error ? "ব্যর্থ" : (data || []).length;
+        counts[t("backupCountFinanceTx")] = error ? t("backupFailedLabel") : (data || []).length;
       }
 
       statusEl.innerHTML =
-        '<div class="progress-box"><b>রিস্টোর সম্পন্ন ✅</b>' +
+        '<div class="progress-box"><b>' + t("backupRestoreComplete") + '</b>' +
         Object.entries(counts).map(([k, v]) => `<div><span>${k}</span><span>${v}</span></div>`).join("") +
         "</div>";
     }

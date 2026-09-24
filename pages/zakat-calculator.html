@@ -50,72 +50,75 @@
         <button class="back-btn" onclick="window.location.href='settings.html'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
-        <h1 style="margin:0;">যাকাত ক্যালকুলেটর</h1>
+        <h1 style="margin:0;" data-i18n="zakatTitle">যাকাত ক্যালকুলেটর</h1>
       </div>
-      <p>আপনার সম্পদের হিসাব দিন, যাকাত হিসাব করে দেব</p>
+      <p data-i18n="zakatSubtitle">আপনার সম্পদের হিসাব দিন, যাকাত হিসাব করে দেব</p>
     </header>
 
     <main class="screen" style="margin-top:-24px;">
       <div class="card" style="box-shadow: var(--shadow-raised);">
-        <p class="small muted" style="margin-top:0;">নিসাব হিসাবের মানদণ্ড বেছে নিন — রূপা-ভিত্তিক নিসাব কম, তাই এতে বেশি মানুষের ওপর যাকাত ফরজ হয় (সতর্কতামূলক); স্বর্ণ-ভিত্তিক নিসাব বেশি।</p>
+        <p class="small muted" style="margin-top:0;" data-i18n="zakatNisabHint">নিসাব হিসাবের মানদণ্ড বেছে নিন — রূপা-ভিত্তিক নিসাব কম, তাই এতে বেশি মানুষের ওপর যাকাত ফরজ হয় (সতর্কতামূলক); স্বর্ণ-ভিত্তিক নিসাব বেশি।</p>
         <div class="nisab-toggle">
-          <label><input type="radio" name="nisabType" value="silver" checked /><span>রূপা-ভিত্তিক নিসাব (৫৯৫ গ্রাম)</span></label>
-          <label><input type="radio" name="nisabType" value="gold" /><span>স্বর্ণ-ভিত্তিক নিসাব (৮৫ গ্রাম)</span></label>
+          <label><input type="radio" name="nisabType" value="silver" checked /><span data-i18n="zakatNisabSilver">রূপা-ভিত্তিক নিসাব (৫৯৫ গ্রাম)</span></label>
+          <label><input type="radio" name="nisabType" value="gold" /><span data-i18n="zakatNisabGold">স্বর্ণ-ভিত্তিক নিসাব (৮৫ গ্রাম)</span></label>
         </div>
 
-        <div class="z-section-title">💰 নগদ ও পাওনা</div>
+        <div class="z-section-title" data-i18n="zakatSectionCash">💰 নগদ ও পাওনা</div>
         <div class="z-field">
-          <label>হাতে/ব্যাংকে নগদ টাকা</label>
+          <label data-i18n="zakatCash">হাতে/ব্যাংকে নগদ টাকা</label>
           <input type="number" id="cash" placeholder="০" min="0" />
         </div>
         <div class="z-field">
-          <label>মানুষের কাছে পাওনা (ফেরত পাবেন এমন)</label>
+          <label data-i18n="zakatReceivable">মানুষের কাছে পাওনা (ফেরত পাবেন এমন)</label>
           <input type="number" id="receivable" placeholder="০" min="0" />
         </div>
         <div class="z-field">
-          <label>ব্যবসায়িক পণ্য/মালামালের মূল্য</label>
+          <label data-i18n="zakatBusiness">ব্যবসায়িক পণ্য/মালামালের মূল্য</label>
           <input type="number" id="business" placeholder="০" min="0" />
         </div>
 
-        <div class="z-section-title">🥇 স্বর্ণ</div>
+        <div class="z-section-title" data-i18n="zakatSectionGold">🥇 স্বর্ণ</div>
         <div class="z-row2">
           <div class="z-field">
-            <label>স্বর্ণের পরিমাণ (গ্রাম)</label>
+            <label data-i18n="zakatGoldGrams">স্বর্ণের পরিমাণ (গ্রাম)</label>
             <input type="number" id="goldGrams" placeholder="০" min="0" />
           </div>
           <div class="z-field">
-            <label>প্রতি গ্রাম দাম (৳)</label>
+            <label data-i18n="zakatPricePerGram">প্রতি গ্রাম দাম (৳)</label>
             <input type="number" id="goldPrice" placeholder="যেমন: ১২০০০" min="0" />
           </div>
         </div>
 
-        <div class="z-section-title">🥈 রূপা</div>
+        <div class="z-section-title" data-i18n="zakatSectionSilver">🥈 রূপা</div>
         <div class="z-row2">
           <div class="z-field">
-            <label>রূপার পরিমাণ (গ্রাম)</label>
+            <label data-i18n="zakatSilverGrams">রূপার পরিমাণ (গ্রাম)</label>
             <input type="number" id="silverGrams" placeholder="০" min="0" />
           </div>
           <div class="z-field">
-            <label>প্রতি গ্রাম দাম (৳)</label>
+            <label data-i18n="zakatPricePerGram">প্রতি গ্রাম দাম (৳)</label>
             <input type="number" id="silverPrice" placeholder="যেমন: ১৫০" min="0" />
           </div>
         </div>
 
-        <div class="z-section-title">📉 ঋণ/দেনা</div>
+        <div class="z-section-title" data-i18n="zakatSectionDebt">📉 ঋণ/দেনা</div>
         <div class="z-field">
-          <label>আপনার নিজের ঋণ (যা শোধ করতে হবে)</label>
+          <label data-i18n="zakatDebt">আপনার নিজের ঋণ (যা শোধ করতে হবে)</label>
           <input type="number" id="debt" placeholder="০" min="0" />
         </div>
 
-        <button class="btn btn--primary mt-4" onclick="calculateZakat()">হিসাব করুন</button>
+        <button class="btn btn--primary mt-4" onclick="calculateZakat()" data-i18n="zakatCalcBtn">হিসাব করুন</button>
 
         <div id="resultBox" style="display:none;"></div>
 
-        <p class="small muted text-center" style="margin-top:16px;">এটি একটি সাধারণ হিসাব-সহায়ক টুল, নির্দিষ্ট মাসয়ালার জন্য স্থানীয় আলেমের পরামর্শ নিন।</p>
+        <p class="small muted text-center" style="margin-top:16px;" data-i18n="zakatFootnote">এটি একটি সাধারণ হিসাব-সহায়ক টুল, নির্দিষ্ট মাসয়ালার জন্য স্থানীয় আলেমের পরামর্শ নিন।</p>
       </div>
     </main>
   </div>
+  <script src="../js/i18n.js"></script>
   <script>
+    applyTranslations();
+
     function formatMoney(n) {
       return "৳" + Number(n || 0).toLocaleString("en-BD", { maximumFractionDigits: 2 });
     }
@@ -146,10 +149,7 @@
       box.style.display = "block";
 
       if (nisab === null) {
-        box.innerHTML =
-          '<div class="result-box notdue"><p class="small" style="margin:0;">নিসাব হিসাব করতে ' +
-          (nisabType === "gold" ? "স্বর্ণের" : "রূপার") +
-          ' প্রতি গ্রাম দাম দিন।</p></div>';
+        box.innerHTML = '<div class="result-box notdue"><p class="small" style="margin:0;">' + t("zakatNeedPrice") + "</p></div>";
         return;
       }
 
@@ -158,12 +158,12 @@
 
       box.innerHTML = `
         <div class="result-box ${isDue ? "due" : "notdue"}">
-          <div class="small" style="opacity:0.85;">${isDue ? "আপনার ওপর যাকাত ফরজ" : "যাকাত ফরজ নয়"}</div>
+          <div class="small" style="opacity:0.85;">${isDue ? t("zakatDue") : t("zakatNotDue")}</div>
           <div class="amt ${isDue ? "due-color" : ""}">${isDue ? formatMoney(zakatAmount) : "—"}</div>
-          ${isDue ? '<div class="small" style="opacity:0.85;">(মোট সম্পদের আড়াই শতাংশ)</div>' : '<div class="small">আপনার মোট সম্পদ নিসাব সীমার নিচে</div>'}
+          ${isDue ? '<div class="small" style="opacity:0.85;">' + t("zakatOfWealth") + "</div>" : '<div class="small">' + t("zakatBelowNisab") + "</div>"}
           <div class="breakdown" style="text-align:left; color:inherit;">
-            <div><span>মোট সম্পদ</span><span>${formatMoney(totalAssets)}</span></div>
-            <div><span>নিসাব সীমা</span><span>${formatMoney(nisab)}</span></div>
+            <div><span>${t("zakatTotalAssets")}</span><span>${formatMoney(totalAssets)}</span></div>
+            <div><span>${t("zakatNisabLimit")}</span><span>${formatMoney(nisab)}</span></div>
           </div>
         </div>
       `;

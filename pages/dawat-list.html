@@ -71,8 +71,8 @@
 
     <main class="screen" style="margin-top:-24px;">
       <div class="view-toggle">
-        <button id="listViewBtn" class="active" onclick="switchView('list')">📋 লিস্ট</button>
-        <button id="calViewBtn" onclick="switchView('calendar')">🗓️ ক্যালেন্ডার</button>
+        <button id="listViewBtn" class="active" onclick="switchView('list')" data-i18n="dawatViewList">📋 লিস্ট</button>
+        <button id="calViewBtn" onclick="switchView('calendar')" data-i18n="dawatViewCalendar">🗓️ ক্যালেন্ডার</button>
       </div>
 
       <div id="calendarView" style="display:none;">
@@ -150,13 +150,18 @@
     function formatDateTime(dtStr) {
       if (!dtStr) return "";
       const d = new Date(dtStr);
-      const months = ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
-      const weekdays = ["রবি","সোম","মঙ্গল","বুধ","বৃহস্পতি","শুক্র","শনি"];
+      const isEn = getLang() === "en";
+      const months = isEn
+        ? ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        : ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
+      const weekdays = isEn
+        ? ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+        : ["রবি","সোম","মঙ্গল","বুধ","বৃহস্পতি","শুক্র","শনি"];
       let h = d.getHours();
       const ampm = h >= 12 ? "PM" : "AM";
       h = h % 12 || 12;
       const m = String(d.getMinutes()).padStart(2, "0");
-      return weekdays[d.getDay()] + "বার, " + d.getDate() + " " + months[d.getMonth()] + ", " + h + ":" + m + " " + ampm;
+      return weekdays[d.getDay()] + t("weekdaySuffix") + ", " + d.getDate() + " " + months[d.getMonth()] + ", " + h + ":" + m + " " + ampm;
     }
 
     const statusLabels = { upcoming: t("statusUpcoming"), completed: t("statusCompleted"), cancelled: t("statusCancelled") };
@@ -256,8 +261,10 @@
     }
 
     function renderCalendar() {
-      const monthsBn = ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
-      const weekdaysBn = ["রবি","সোম","মঙ্গল","বুধ","বৃহ","শুক্র","শনি"];
+      const monthsBn = getLang() === "en"
+        ? ["January","February","March","April","May","June","July","August","September","October","November","December"]
+        : ["জানুয়ারি","ফেব্রুয়ারি","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্টেম্বর","অক্টোবর","নভেম্বর","ডিসেম্বর"];
+      const weekdaysBn = getLang() === "en" ? ["Su","Mo","Tu","We","Th","Fr","Sa"] : ["রবি","সোম","মঙ্গল","বুধ","বৃহ","শুক্র","শনি"];
       document.getElementById("calMonthLabel").textContent = monthsBn[calDate.getMonth()] + " " + calDate.getFullYear();
 
       const year = calDate.getFullYear();
@@ -299,7 +306,7 @@
     function renderCalDayList(dawatsOnDay) {
       const el = document.getElementById("calDayList");
       if (dawatsOnDay.length === 0) {
-        el.innerHTML = '<p class="muted small text-center">এই দিনে কোনো দাওয়াত নেই।</p>';
+        el.innerHTML = '<p class="muted small text-center">' + t("dawatCalNoDawat") + "</p>";
         return;
       }
       el.innerHTML = dawatsOnDay

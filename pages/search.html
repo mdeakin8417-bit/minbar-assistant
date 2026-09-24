@@ -40,19 +40,19 @@
         <button class="back-btn" onclick="window.location.href='dashboard.html'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
-        <h1 style="margin:0;">🔍 সার্চ মিনবার</h1>
+        <h1 style="margin:0;" data-i18n="searchTitle">🔍 সার্চ মিনবার</h1>
       </div>
-      <p>বায়ান, দাওয়াত, গ্রাহক, হিসাব — সব একসাথে খুঁজুন</p>
+      <p data-i18n="searchSubtitle">বায়ান, দাওয়াত, গ্রাহক, হিসাব — সব একসাথে খুঁজুন</p>
     </header>
 
     <main class="screen">
       <div class="search-box">
         <span>🔍</span>
-        <input type="text" id="searchInput" placeholder="নাম, শিরোনাম বা বিবরণ লিখুন..." autofocus />
+        <input type="text" id="searchInput" placeholder="নাম, শিরোনাম বা বিবরণ লিখুন..." data-i18n-placeholder="searchPlaceholder" autofocus />
       </div>
 
       <div id="results"></div>
-      <div class="empty-hint" id="emptyHint">খোঁজার জন্য উপরে লিখুন</div>
+      <div class="empty-hint" id="emptyHint" data-i18n="searchEmptyPrompt">খোঁজার জন্য উপরে লিখুন</div>
     </main>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -76,7 +76,7 @@
       if (!q || q.trim().length < 2) {
         resultsEl.innerHTML = "";
         emptyHint.style.display = "block";
-        emptyHint.textContent = "খোঁজার জন্য উপরে লিখুন";
+        emptyHint.textContent = t("searchEmptyPrompt");
         return;
       }
       emptyHint.style.display = "none";
@@ -94,7 +94,7 @@
       if (bayans.data && bayans.data.length > 0) {
         sections.push(`
           <div class="result-section">
-            <h4>📖 বায়ান (${bayans.data.length})</h4>
+            <h4>${t("searchSectionBayan")} (${bayans.data.length})</h4>
             ${bayans.data.map((b) => `
               <div class="result-row" onclick="window.location.href='bayan-detail.html?id=${b.id}'">
                 <div><div class="title">${escapeHtml(b.title)}</div></div>
@@ -104,7 +104,7 @@
       if (dawats.data && dawats.data.length > 0) {
         sections.push(`
           <div class="result-section">
-            <h4>🍽️ দাওয়াত (${dawats.data.length})</h4>
+            <h4>${t("searchSectionDawat")} (${dawats.data.length})</h4>
             ${dawats.data.map((d) => `
               <div class="result-row" onclick="window.location.href='dawat-detail.html?id=${d.id}'">
                 <div><div class="title">${escapeHtml(d.host_name)}</div><div class="sub">${new Date(d.dawat_datetime).toLocaleDateString("bn-BD")}</div></div>
@@ -114,7 +114,7 @@
       if (customers.data && customers.data.length > 0) {
         sections.push(`
           <div class="result-section">
-            <h4>👤 গ্রাহক (${customers.data.length})</h4>
+            <h4>${t("searchSectionCustomer")} (${customers.data.length})</h4>
             ${customers.data.map((c) => `
               <div class="result-row" onclick="window.location.href='customer-detail.html?id=${c.id}'">
                 <div><div class="title">${escapeHtml(c.name)}</div><div class="sub">${escapeHtml(c.phone || "")}</div></div>
@@ -124,11 +124,11 @@
       if (txs.data && txs.data.length > 0) {
         sections.push(`
           <div class="result-section">
-            <h4>💰 হিসাব (${txs.data.length})</h4>
-            ${txs.data.map((t) => `
-              <div class="result-row" onclick="window.location.href='finance-detail.html?id=${t.id}'">
-                <div><div class="title">${escapeHtml(t.description || "লেনদেন")}</div></div>
-                <div class="amt" style="color:${t.type === "income" ? "var(--income)" : "var(--expense)"};">${t.type === "income" ? "+" : "-"}${formatMoney(t.amount)}</div>
+            <h4>${t("searchSectionFinance")} (${txs.data.length})</h4>
+            ${txs.data.map((t2) => `
+              <div class="result-row" onclick="window.location.href='finance-detail.html?id=${t2.id}'">
+                <div><div class="title">${escapeHtml(t2.description || t("searchTxFallback"))}</div></div>
+                <div class="amt" style="color:${t2.type === "income" ? "var(--income)" : "var(--expense)"};">${t2.type === "income" ? "+" : "-"}${formatMoney(t2.amount)}</div>
               </div>`).join("")}
           </div>`);
       }
@@ -136,7 +136,7 @@
       if (sections.length === 0) {
         resultsEl.innerHTML = "";
         emptyHint.style.display = "block";
-        emptyHint.textContent = "কিছু পাওয়া যায়নি";
+        emptyHint.textContent = t("searchNoResults");
         return;
       }
       resultsEl.innerHTML = sections.join("");

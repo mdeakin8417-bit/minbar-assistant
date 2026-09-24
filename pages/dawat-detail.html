@@ -66,13 +66,18 @@
     function formatDateTime(dtStr) {
       if (!dtStr) return "";
       const d = new Date(dtStr);
-      const months = ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
-      const weekdays = ["রবি","সোম","মঙ্গল","বুধ","বৃহস্পতি","শুক্র","শনি"];
+      const isEn = getLang() === "en";
+      const months = isEn
+        ? ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        : ["জানু","ফেব্রু","মার্চ","এপ্রিল","মে","জুন","জুলাই","আগস্ট","সেপ্ট","অক্টো","নভে","ডিসে"];
+      const weekdays = isEn
+        ? ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+        : ["রবি","সোম","মঙ্গল","বুধ","বৃহস্পতি","শুক্র","শনি"];
       let h = d.getHours();
       const ampm = h >= 12 ? "PM" : "AM";
       h = h % 12 || 12;
       const m = String(d.getMinutes()).padStart(2, "0");
-      return weekdays[d.getDay()] + "বার, " + d.getDate() + " " + months[d.getMonth()] + ", " + h + ":" + m + " " + ampm;
+      return weekdays[d.getDay()] + t("weekdaySuffix") + ", " + d.getDate() + " " + months[d.getMonth()] + ", " + h + ":" + m + " " + ampm;
     }
 
     const reminderLabels = { 0: "রিমাইন্ডার নেই", 30: "৩০ মিনিট আগে", 60: "১ ঘণ্টা আগে", 120: "২ ঘণ্টা আগে", 1440: "১ দিন আগে" };
