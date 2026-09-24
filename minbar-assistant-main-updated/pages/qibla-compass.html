@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — কিবলা কম্পাস</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .back-btn-wrap { display:flex; gap:10px; align-items:center; margin-bottom:6px; }
+
+    .gate-box { text-align:center; padding: 30px 16px; }
+    .gate-box .emoji { font-size:44px; margin-bottom:10px; }
+
+    .compass-wrap { display:flex; flex-direction:column; align-items:center; padding: 10px 0 6px; }
+    .compass-ring {
+      width: 260px; height: 260px; border-radius:50%; position:relative;
+      background: radial-gradient(circle at 50% 50%, var(--surface) 60%, var(--surface-sunken) 100%);
+      border: 3px solid var(--border-strong); display:flex; align-items:center; justify-content:center;
+      transition: box-shadow 0.25s;
+    }
+    .compass-ring.aligned { border-color: var(--income); box-shadow: 0 0 0 8px var(--income-bg); }
+    .compass-ring .tick-n {
+      position:absolute; top:10px; left:50%; transform:translateX(-50%); font-weight:700; font-size:13px; color: var(--ink-faint);
+    }
+    .kaaba-pointer {
+      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+      padding-top: 26px; transition: transform 0.15s linear;
+    }
+    .kaaba-pointer .icon { font-size:38px; }
+    .kaaba-pointer .arrow {
+      width:0; height:0; margin-top:2px;
+      border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 22px solid var(--gold-600);
+    }
+    .compass-ring.aligned .arrow { border-bottom-color: var(--income); }
+    .center-dot { width:10px; height:10px; border-radius:50%; background: var(--ink-faint); }
+
+    .heading-readout { text-align:center; margin-top:16px; }
+    .heading-readout .deg { font-size:26px; font-weight:700; color: var(--teal-800); }
+    .heading-readout .note { font-size:13px; color: var(--ink-muted); margin-top:2px; }
+
+    .aligned-msg { text-align:center; color: var(--income); font-weight:700; margin-top:10px; display:none; }
+    .aligned-msg.show { display:block; }
+
+    .calib-card { text-align:center; }
+    .calib-figure8 { font-size:40px; display:inline-block; animation: wiggle 1.6s ease-in-out infinite; }
+    @keyframes wiggle { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(180deg); } }
+
+    .info-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); font-size:13.5px; }
+    .info-row:last-child { border-bottom:none; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row back-btn-wrap">
+        <button class="back-btn" onclick="window.location.href='settings.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <h1 style="margin:0;">🕋 কিবলা কম্পাস</h1>
+      </div>
+      <p>ফোন সমতল রেখে ধরুন, কাবা শরীফের দিক দেখাবে</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+
+      <div class="card" id="gateCard">
+        <div class="gate-box">
+          <div class="emoji">🧭</div>
+          <p class="small muted" style="max-width:280px; margin:0 auto 16px;">সঠিক কিবলার দিক দেখাতে আপনার লোকেশন ও ফোনের কম্পাস সেন্সর ব্যবহারের অনুমতি প্রয়োজন।</p>
+          <button class="btn btn--primary" id="startBtn">চালু করুন</button>
+          <p class="small muted" id="gateError" style="color: var(--danger); margin-top:12px; display:none;"></p>
+        </div>
+      </div>
+
+      <div id="compassCard" style="display:none;">
+        <div class="card">
+          <div class="compass-wrap">
+            <div class="compass-ring" id="ring">
+              <span class="tick-n">উত্তর</span>
+              <div class="kaaba-pointer" id="pointer">
+                <span class="icon">🕋</span>
+                <span class="arrow"></span>
+              </div>
+              <div class="center-dot"></div>
+            </div>
+          </div>
+          <div class="heading-readout">
+            <div class="deg" id="degReadout">--°</div>
+            <div class="note">কাবা শরীফের দিকে ঘুরতে ফোনটি ধীরে ধীরে ঘোরান</div>
+          </div>
+          <div class="aligned-msg" id="alignedMsg">✅ আপনি এখন কিবলামুখী</div>
+        </div>
+
+        <div class="card">
+          <div class="info-row"><span class="muted">কিবলার দিক (উত্তর থেকে)</span><span id="qiblaBearingText" style="font-weight:700;">--°</span></div>
+          <div class="info-row"><span class="muted">আপনার অবস্থান</span><span id="locText" style="font-weight:700;">--</span></div>
+          <div class="info-row"><span class="muted">কাবা শরীফ থেকে দূরত্ব</span><span id="distText" style="font-weight:700;">--</span></div>
+        </div>
+
+        <div class="card calib-card">
+          <div class="calib-figure8">🎚️</div>
+          <p class="small muted" style="margin:8px 0 0;">কম্পাস সঠিক না দেখালে ফোনটি হাতে নিয়ে <strong>৮ (আট)</strong> এর মতো আকারে কয়েকবার ঘোরান, তারপর আবার ফ্ল্যাট ধরুন।</p>
+        </div>
+
+        <p class="small muted text-center" style="margin-top:4px;">লোহা/চুম্বক জাতীয় জিনিস বা ইলেকট্রনিক ডিভাইসের কাছে কম্পাস ভুল দেখাতে পারে।</p>
+      </div>
+
+    </main>
+
+    <nav class="bottom-nav">
+      <a href="dashboard.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>হোম</span>
+      </a>
+      <a href="bayan-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>বায়ান</span>
+      </a>
+      <a href="dawat-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>দাওয়াত</span>
+      </a>
+      <a href="finance-list.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span>হিসাব</span>
+      </a>
+      <a href="settings.html" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>সেটিংস</span>
+      </a>
+    </nav>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    const KAABA_LAT = 21.4225;
+    const KAABA_LON = 39.8262;
+    let qiblaBearing = null;
+    let wasAligned = false;
+
+    (async function guard() {
+      const user = await getCurrentUser();
+      if (!user) { window.location.replace("login.html"); return; }
+    })();
+
+    function toRad(d) { return (d * Math.PI) / 180; }
+    function toDeg(r) { return (r * 180) / Math.PI; }
+
+    function calcQiblaBearing(lat, lon) {
+      const phi1 = toRad(lat);
+      const phi2 = toRad(KAABA_LAT);
+      const dLambda = toRad(KAABA_LON - lon);
+      const y = Math.sin(dLambda) * Math.cos(phi2);
+      const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLambda);
+      return (toDeg(Math.atan2(y, x)) + 360) % 360;
+    }
+
+    function calcDistanceKm(lat, lon) {
+      const R = 6371;
+      const dLat = toRad(KAABA_LAT - lat);
+      const dLon = toRad(KAABA_LON - lon);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat)) * Math.cos(toRad(KAABA_LAT)) * Math.sin(dLon / 2) ** 2;
+      return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
+    function toBn(n) {
+      const map = { 0: "০", 1: "১", 2: "২", 3: "৩", 4: "৪", 5: "৫", 6: "৬", 7: "৭", 8: "৮", 9: "৯" };
+      return String(n).replace(/[0-9]/g, (d) => map[d]);
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startCompass);
+
+    async function startCompass() {
+      const errEl = document.getElementById("gateError");
+      errEl.style.display = "none";
+
+      // ১) লোকেশন পারমিশন + স্থানাঙ্ক
+      let pos;
+      try {
+        pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 });
+        });
+      } catch (e) {
+        errEl.textContent = "লোকেশন পাওয়া যায়নি। ফোনের সেটিংসে লোকেশন পারমিশন চালু করুন।";
+        errEl.style.display = "block";
+        return;
+      }
+
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      qiblaBearing = calcQiblaBearing(lat, lon);
+
+      document.getElementById("qiblaBearingText").textContent = toBn(Math.round(qiblaBearing)) + "°";
+      document.getElementById("locText").textContent = toBn(lat.toFixed(2)) + "°, " + toBn(lon.toFixed(2)) + "°";
+      document.getElementById("distText").textContent = toBn(calcDistanceKm(lat, lon)) + " কিমি";
+
+      // ২) কম্পাস/অরিয়েন্টেশন সেন্সর পারমিশন (iOS ১৩+ এ আলাদাভাবে চাইতে হয়)
+      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+        try {
+          const result = await DeviceOrientationEvent.requestPermission();
+          if (result !== "granted") {
+            errEl.textContent = "কম্পাস সেন্সর ব্যবহারের অনুমতি পাওয়া যায়নি।";
+            errEl.style.display = "block";
+            return;
+          }
+        } catch (e) {
+          errEl.textContent = "এই ব্রাউজারে কম্পাস সেন্সর সমর্থিত নয়।";
+          errEl.style.display = "block";
+          return;
+        }
+      }
+
+      document.getElementById("gateCard").style.display = "none";
+      document.getElementById("compassCard").style.display = "block";
+
+      if ("ondeviceorientationabsolute" in window) {
+        window.addEventListener("deviceorientationabsolute", handleOrientation, true);
+      } else if (typeof DeviceOrientationEvent !== "undefined") {
+        window.addEventListener("deviceorientation", handleOrientation, true);
+      } else {
+        document.getElementById("degReadout").textContent = "সেন্সর নেই";
+      }
+    }
+
+    function handleOrientation(event) {
+      let heading;
+      if (typeof event.webkitCompassHeading === "number") {
+        heading = event.webkitCompassHeading; // iOS Safari — সরাসরি সত্যিকারের উত্তর থেকে হেডিং
+      } else if (event.alpha !== null && event.alpha !== undefined) {
+        heading = 360 - event.alpha; // Android/অন্যান্য ব্রাউজার — আনুমানিক রূপান্তর
+      } else {
+        return;
+      }
+      updateCompass(heading);
+    }
+
+    function normalizeAngle(a) {
+      let x = a % 360;
+      if (x < -180) x += 360;
+      if (x > 180) x -= 360;
+      return x;
+    }
+
+    function updateCompass(heading) {
+      if (qiblaBearing === null) return;
+      const relative = normalizeAngle(qiblaBearing - heading);
+      document.getElementById("pointer").style.transform = "rotate(" + relative + "deg)";
+      document.getElementById("degReadout").textContent = toBn(Math.round((heading + 360) % 360)) + "°";
+
+      const aligned = Math.abs(relative) <= 5;
+      const ring = document.getElementById("ring");
+      const alignedMsg = document.getElementById("alignedMsg");
+      ring.classList.toggle("aligned", aligned);
+      alignedMsg.classList.toggle("show", aligned);
+
+      if (aligned && !wasAligned && navigator.vibrate) {
+        navigator.vibrate(120);
+      }
+      wasAligned = aligned;
+    }
+  </script>
+</body>
+</html>

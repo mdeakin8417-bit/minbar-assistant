@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — মিডিয়া স্টোরেজ প্যাকেজ</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .topup-card {
+      border: 1.5px solid var(--gold-600); border-radius: var(--radius-lg); padding: 20px;
+      margin-bottom: 16px; text-align: center; background: rgba(201,152,46,0.06);
+    }
+    .topup-gb { font-size: 28px; font-weight: 700; color: var(--teal-900); }
+    .topup-price { font-size: 22px; font-weight: 700; color: var(--gold-700); margin-top: 4px; }
+    .topup-note { font-size: 12.5px; color: var(--ink-muted); margin-top: 6px; }
+    .stack-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
+    .stack-table th, .stack-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--border); }
+    .stack-table th { color: var(--ink-muted); font-weight: 600; font-size: 12px; }
+    .stack-table td:last-child { font-weight: 700; color: var(--teal-800); }
+    .how-box { background: var(--surface-sunken); border-radius: var(--radius-md); padding: 16px; margin-top: var(--space-4); }
+    .how-box ol { margin: 8px 0 0; padding-right: 18px; font-size: 14px; line-height: 1.9; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <div class="row" style="gap:10px; margin-bottom:6px;">
+        <button class="back-btn" onclick="window.location.href='bayan-form.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <h1 style="margin:0;">মিডিয়া স্টোরেজ প্যাকেজ</h1>
+      </div>
+      <p>সরাসরি ছবি/ভিডিও আপলোড করতে একটা প্যাকেজ কিনুন</p>
+    </header>
+
+    <main class="screen" style="margin-top:-24px;">
+      <div class="card">
+        <p class="muted" style="margin-bottom:16px;">ইউটিউব/ফেসবুক লিংক দেওয়া সবসময় <b>সম্পূর্ণ ফ্রি</b>, PDF ফাইলও ফ্রি। সরাসরি ছবি বা ভিডিও ফাইল আপলোড করতে চাইলে একবার টাকা দিয়ে স্টোরেজ কিনে নিন — <b>মাসিক কোনো চার্জ নেই</b>, যা কিনবেন তা সারাজীবন থাকবে।</p>
+
+        <div class="topup-card">
+          <div class="topup-gb">+ ৫ জিবি</div>
+          <div class="topup-price">৳১,০০০</div>
+          <div class="topup-note">একবারের পেমেন্ট · সারাজীবনের জন্য</div>
+        </div>
+
+        <p class="small muted text-center" style="margin-top:6px;">যতবার ইচ্ছা ততবার কিনতে পারবেন — প্রতিবার কেনায় আগের কোটার সাথে নতুন ৫ জিবি যোগ হয়ে যাবে।</p>
+
+        <table class="stack-table">
+          <tr><th>মোট পেমেন্ট</th><th>মোট স্টোরেজ</th></tr>
+          <tr><td>৳১,০০০ (১ম বার)</td><td>৫ জিবি</td></tr>
+          <tr><td>৳২,০০০ (২য় বার)</td><td>১০ জিবি</td></tr>
+          <tr><td>৳৩,০০০ (৩য় বার)</td><td>১৫ জিবি</td></tr>
+          <tr><td>৳৪,০০০ (৪র্থ বার)</td><td>২০ জিবি</td></tr>
+        </table>
+
+        <div class="how-box">
+          <b>যেভাবে সক্রিয় করবেন</b>
+          <ol>
+            <li>৫ জিবির জন্য ৳১,০০০ bKash/Nagad-এ পাঠান</li>
+            <li>পেমেন্টের স্ক্রিনশট দিয়ে "মতামত/অভিযোগ" পেজ থেকে জানান, অথবা সরাসরি যোগাযোগ করুন</li>
+            <li>যাচাই করে আপনার প্রতিষ্ঠানের আগের কোটার সাথে নতুন ৫ জিবি যোগ করে দেওয়া হবে</li>
+            <li>এরপর বায়ান পেজ থেকে সরাসরি ছবি/ভিডিও ফাইল আপলোড করতে পারবেন</li>
+            <li>আরও স্টোরেজ লাগলে যেকোনো সময় আবার ৳১,০০০ দিয়ে আরও ৫ জিবি যোগ করতে পারবেন</li>
+          </ol>
+        </div>
+
+        <button class="btn btn--primary mt-6" onclick="window.location.href='feedback.html?category=storage'">যোগাযোগ করুন</button>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

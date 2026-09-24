@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <script>try{if(localStorage.getItem("minbar_theme")==="dark")document.documentElement.setAttribute("data-theme","dark");}catch(e){}</script>
+  <script>try{if(localStorage.getItem("minbar_lock_enabled")==="1"&&sessionStorage.getItem("minbar_unlocked")!=="1"){var p=window.location.pathname.split("/").pop();window.location.replace("lock.html?redirect="+encodeURIComponent(p));}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Minbar Assistant — প্রতিষ্ঠান যোগ করুন</title>
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#123832" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png" />
+  <link rel="icon" href="../icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: var(--space-4); }
+    .type-option {
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--surface);
+    }
+    .type-option.selected { border-color: var(--gold-600); background: var(--surface-sunken); }
+    .type-option .emoji { font-size: 26px; display:block; margin-bottom:6px; }
+    .type-option .label { font-size: 14px; font-weight: 600; color: var(--teal-900); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="arch-header">
+      <h1 data-i18n="addInstTitle">প্রতিষ্ঠান যোগ করুন</h1>
+      <p data-i18n="addInstSubtitle">কোন ধরনের হিসাবখাতা তৈরি করবেন?</p>
+    </header>
+
+    <main class="screen" style="margin-top:-28px;">
+      <div class="card" style="box-shadow: var(--shadow-raised);">
+        <div id="alertBox" class="alert"></div>
+
+        <form id="instForm" class="stack">
+          <div class="type-grid" id="typeGrid">
+            <div class="type-option" data-type="personal">
+              <span class="emoji">👤</span><span class="label" data-i18n="typePersonal">ব্যক্তিগত</span>
+            </div>
+            <div class="type-option" data-type="mosque">
+              <span class="emoji">🕌</span><span class="label" data-i18n="typeMosque">মসজিদ</span>
+            </div>
+            <div class="type-option" data-type="madrasa">
+              <span class="emoji">📖</span><span class="label" data-i18n="typeMadrasa">মাদ্রাসা</span>
+            </div>
+            <div class="type-option" data-type="hostel">
+              <span class="emoji">🏨</span><span class="label" data-i18n="typeHostel">হোস্টেল</span>
+            </div>
+            <div class="type-option" data-type="business" style="grid-column: 1 / -1;">
+              <span class="emoji">🏪</span><span class="label" data-i18n="typeBusiness">ব্যবসা / দোকান</span>
+            </div>
+          </div>
+          <div class="field-error" id="typeError" style="display:none; margin-top:-8px; margin-bottom:12px;">একটি ধরন বেছে নিন</div>
+
+          <div class="field" id="nameField">
+            <label for="instName" data-i18n="name">নাম</label>
+            <input type="text" id="instName" placeholder="যেমন: বায়তুল আমান জামে মসজিদ" required />
+            <div class="field-error">নাম লিখুন</div>
+          </div>
+
+          <div class="field">
+            <label for="instAddress" data-i18n="address">ঠিকানা (ঐচ্ছিক)</label>
+            <input type="text" id="instAddress" placeholder="এলাকা / ঠিকানা" />
+          </div>
+
+          <button type="submit" class="btn btn--primary" id="saveBtn">
+            <span class="btn-label" data-i18n="create">তৈরি করুন</span>
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/supabase-client.js"></script>
+  <script>
+    applyTranslations();
+    let selectedType = null;
+    const typeGrid = document.getElementById("typeGrid");
+    typeGrid.querySelectorAll(".type-option").forEach((el) => {
+      el.addEventListener("click", () => {
+        typeGrid.querySelectorAll(".type-option").forEach((o) => o.classList.remove("selected"));
+        el.classList.add("selected");
+        selectedType = el.dataset.type;
+        document.getElementById("typeError").style.display = "none";
+      });
+    });
+
+    const alertBox = document.getElementById("alertBox");
+    function showAlert(message, type) {
+      alertBox.textContent = message;
+      alertBox.className = "alert show alert--" + type;
+    }
+
+    let currentUser = null;
+    (async () => {
+      currentUser = await getCurrentUser();
+      if (!currentUser) window.location.replace("login.html");
+    })();
+
+    document.getElementById("instForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("instName").value.trim();
+      const address = document.getElementById("instAddress").value.trim();
+      const nameField = document.getElementById("nameField");
+
+      let hasError = false;
+      if (!selectedType) {
+        document.getElementById("typeError").style.display = "block";
+        hasError = true;
+      }
+      if (!name) {
+        nameField.classList.add("has-error");
+        hasError = true;
+      } else {
+        nameField.classList.remove("has-error");
+      }
+      if (hasError) return;
+
+      const btn = document.getElementById("saveBtn");
+      btn.disabled = true;
+      btn.querySelector(".btn-label").textContent = "তৈরি হচ্ছে...";
+
+      const { error } = await db.from("institutions").insert({
+        owner_id: currentUser.id,
+        name,
+        type: selectedType,
+        address: address || null,
+      });
+
+      btn.disabled = false;
+      btn.querySelector(".btn-label").textContent = "তৈরি করুন";
+
+      if (error) {
+        showAlert("তৈরি করা যায়নি: " + error.message, "error");
+        return;
+      }
+      window.location.href = "dashboard.html";
+    });
+  </script>
+</body>
+</html>
