@@ -68,17 +68,17 @@
         <button class="back-btn" onclick="window.location.href='settings.html'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
-        <h1 style="margin:0;">🤲 আমল ট্র্যাকার</h1>
+        <h1 style="margin:0;" data-i18n="amalTitle">🤲 আমল ট্র্যাকার</h1>
       </div>
-      <p>প্রতিদিনের ইবাদতের ধারাবাহিকতা ধরে রাখুন</p>
+      <p data-i18n="amalSubtitle">প্রতিদিনের ইবাদতের ধারাবাহিকতা ধরে রাখুন</p>
     </header>
 
     <main class="screen" style="margin-top:-24px;">
 
       <div class="streak-card" id="streakCard">
         <div>
-          <div class="small" style="opacity:0.8;">ধারাবাহিক দিন</div>
-          <div><span class="streak-flame">🔥</span> <span class="streak-num" id="streakNum">০</span> <span class="small" style="opacity:0.85;">দিন</span></div>
+          <div class="small" style="opacity:0.8;" data-i18n="amalStreakLabel">ধারাবাহিক দিন</div>
+          <div><span class="streak-flame">🔥</span> <span class="streak-num" id="streakNum">০</span> <span class="small" style="opacity:0.85;" data-i18n="amalDaySuffix">দিন</span></div>
         </div>
         <div style="text-align:left; min-width:110px;">
           <div class="small" style="opacity:0.8;" id="todayProgressLabel">আজ ০/০ সম্পন্ন</div>
@@ -87,8 +87,8 @@
       </div>
 
       <div id="eveningBanner" class="evening-banner" style="display:none;">
-        সন্ধ্যার পরে আজকের আমল যাচাই করাই ভালো।
-        <a id="checkNowLink">এখনই যাচাই করতে চাই</a>
+        <span data-i18n="amalEveningHint">সন্ধ্যার পরে আজকের আমল যাচাই করাই ভালো।</span>
+        <a id="checkNowLink" data-i18n="amalCheckNow">এখনই যাচাই করতে চাই</a>
       </div>
 
       <div id="backlogSection"></div>
@@ -96,27 +96,27 @@
       <div id="goalsSection"></div>
 
       <div id="emptyState" class="empty-state" style="display:none;">
-        <p>এখনো কোনো আমল যোগ করা হয়নি।</p>
+        <p data-i18n="amalEmpty">এখনো কোনো আমল যোগ করা হয়নি।</p>
       </div>
 
-      <button class="btn btn--ghost mt-4" id="addGoalToggleBtn" style="width:100%;">+ নতুন আমল যোগ করুন</button>
+      <button class="btn btn--ghost mt-4" id="addGoalToggleBtn" style="width:100%;" data-i18n="amalAddGoal">+ নতুন আমল যোগ করুন</button>
 
       <div class="card add-form" id="addGoalForm" style="display:none; margin-top:12px;">
         <div class="field">
-          <label>আমলের নাম</label>
-          <input type="text" id="newGoalTitle" placeholder="যেমন: দরূদ শরীফ" />
+          <label data-i18n="amalGoalTitle">আমলের নাম</label>
+          <input type="text" id="newGoalTitle" placeholder="যেমন: দরূদ শরীফ" data-i18n-placeholder="amalGoalTitlePh" />
         </div>
         <div class="field">
-          <label>দৈনিক টার্গেট (ঐচ্ছিক)</label>
-          <input type="text" id="newGoalTarget" placeholder="যেমন: ৫০০ বার / ৫ পৃষ্ঠা" />
+          <label data-i18n="amalGoalTarget">দৈনিক টার্গেট (ঐচ্ছিক)</label>
+          <input type="text" id="newGoalTarget" placeholder="যেমন: ৫০০ বার / ৫ পৃষ্ঠা" data-i18n-placeholder="amalGoalTargetPh" />
         </div>
         <div class="row" style="gap:10px;">
-          <button class="btn btn--ghost" style="flex:1;" id="cancelAddGoalBtn">বাতিল</button>
-          <button class="btn btn--primary" style="flex:1;" id="saveGoalBtn">যোগ করুন</button>
+          <button class="btn btn--ghost" style="flex:1;" id="cancelAddGoalBtn" data-i18n="cancel">বাতিল</button>
+          <button class="btn btn--primary" style="flex:1;" id="saveGoalBtn" data-i18n="amalSave">যোগ করুন</button>
         </div>
       </div>
 
-      <div class="section-title" style="margin-top:28px;">এই সপ্তাহের অগ্রগতি</div>
+      <div class="section-title" style="margin-top:28px;" data-i18n="amalWeekly">এই সপ্তাহের অগ্রগতি</div>
       <div id="weeklySection"></div>
 
     </main>
@@ -124,23 +124,23 @@
     <nav class="bottom-nav">
       <a href="dashboard.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>হোম</span>
+        <span data-i18n="navHome">হোম</span>
       </a>
       <a href="bayan-list.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span>বায়ান</span>
+        <span data-i18n="navBayan">বায়ান</span>
       </a>
       <a href="dawat-list.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>দাওয়াত</span>
+        <span data-i18n="navDawat">দাওয়াত</span>
       </a>
       <a href="finance-list.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        <span>হিসাব</span>
+        <span data-i18n="navFinance">হিসাব</span>
       </a>
       <a href="settings.html" class="active">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        <span>সেটিংস</span>
+        <span data-i18n="navSettings">সেটিংস</span>
       </a>
     </nav>
   </div>
@@ -149,7 +149,8 @@
   <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script>
-    const BN_DAY_LETTERS = ["র", "সো", "ম", "বু", "বৃ", "শু", "শ"]; // রবি..শনি
+    applyTranslations();
+    const BN_DAY_LETTERS = getLang() === "en" ? ["Su","Mo","Tu","We","Th","Fr","Sa"] : ["র", "সো", "ম", "বু", "বৃ", "শু", "শ"]; // রবি..শনি
     let currentUserId = null;
     let allGoals = [];
     let logsByGoal = {}; // goalId -> { "YYYY-MM-DD": true/false }
@@ -181,7 +182,7 @@
         .eq("is_active", true)
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: true });
-      if (gErr) { showConnectionError("আমলের তথ্য লোড করা যায়নি।"); return; }
+      if (gErr) { showConnectionError(t("amalLoadError")); return; }
       allGoals = goals || [];
 
       if (allGoals.length === 0) {
@@ -248,18 +249,18 @@
 
           let body;
           if (!showToday) {
-            body = `<p class="small muted" style="margin:10px 0 0;">সন্ধ্যার পরে আজকের অবস্থা যাচাই করুন।</p>`;
+            body = `<p class="small muted" style="margin:10px 0 0;">${t("amalEveningCheckHint")}</p>`;
           } else if (!answered) {
             body = `
               <div class="checkin-row">
-                <button class="checkin-btn yes" onclick="answerToday('${g.id}', true)">হ্যাঁ, সম্পন্ন হয়েছে</button>
-                <button class="checkin-btn no" onclick="answerToday('${g.id}', false)">না</button>
+                <button class="checkin-btn yes" onclick="answerToday('${g.id}', true)">${t("amalYesDone")}</button>
+                <button class="checkin-btn no" onclick="answerToday('${g.id}', false)">${t("amalNo")}</button>
               </div>`;
           } else {
             body = `
               <div class="status-pill ${log ? "done" : "missed"}">
-                ${log ? "✅ আজ সম্পন্ন হয়েছে" : "❌ আজ হয়নি"}
-                <span class="redo" onclick="answerToday('${g.id}', ${!log})">পরিবর্তন করুন</span>
+                ${log ? t("amalDoneToday") : t("amalNotDoneToday")}
+                <span class="redo" onclick="answerToday('${g.id}', ${!log})">${t("amalChangeAnswer")}</span>
               </div>`;
           }
 
@@ -286,7 +287,7 @@
         { user_id: currentUserId, goal_id: goalId, log_date: today, completed, answered_at: new Date().toISOString() },
         { onConflict: "goal_id,log_date" }
       );
-      if (error) { await showAppAlert("সেভ করা যায়নি, আবার চেষ্টা করুন।", "⚠️"); return; }
+      if (error) { await showAppAlert(t("amalSaveFailed"), "⚠️"); return; }
       if (!logsByGoal[goalId]) logsByGoal[goalId] = {};
       logsByGoal[goalId][today] = completed;
       renderGoals();
@@ -294,7 +295,6 @@
       renderWeekly();
     }
 
-    // ---------- মিস হওয়া গতকাল/আগের দিনের এন্ট্রি (সর্বোচ্চ ২ দিন পেছনে) ----------
     function renderBacklog() {
       const today = todayStr(0);
       const items = [];
@@ -312,12 +312,12 @@
         return;
       }
 
-      const dayLabel = (back) => (back === 1 ? "গতকাল" : "তার আগের দিন");
+      const dayLabel = (back) => (back === 1 ? t("amalYesterday") : t("amalDayBefore"));
 
       document.getElementById("backlogSection").innerHTML = `
         <div class="card backlog-card">
           <div class="row-between" style="margin-bottom:8px;">
-            <strong style="font-size:14px;">⏳ মিস হওয়া এন্ট্রি পূরণ করুন</strong>
+            <strong style="font-size:14px;">${t("amalBacklogTitle")}</strong>
           </div>
           ${items
             .map(
@@ -325,8 +325,8 @@
             <div class="row-between" style="padding:8px 0; border-bottom:1px solid var(--border);">
               <span class="small">${escapeHtml(it.goal.title)} — ${dayLabel(it.back)}</span>
               <div style="display:flex; gap:6px;">
-                <button class="btn btn--ghost" style="padding:6px 12px; font-size:12.5px;" onclick="answerBacklog('${it.goal.id}','${it.dateStr}',true)">হ্যাঁ</button>
-                <button class="btn btn--ghost" style="padding:6px 12px; font-size:12.5px;" onclick="answerBacklog('${it.goal.id}','${it.dateStr}',false)">না</button>
+                <button class="btn btn--ghost" style="padding:6px 12px; font-size:12.5px;" onclick="answerBacklog('${it.goal.id}','${it.dateStr}',true)">${t("amalYesDone")}</button>
+                <button class="btn btn--ghost" style="padding:6px 12px; font-size:12.5px;" onclick="answerBacklog('${it.goal.id}','${it.dateStr}',false)">${t("amalNo")}</button>
               </div>
             </div>`
             )
@@ -339,7 +339,7 @@
         { user_id: currentUserId, goal_id: goalId, log_date: dateStr, completed, answered_at: new Date().toISOString() },
         { onConflict: "goal_id,log_date" }
       );
-      if (error) { await showAppAlert("সেভ করা যায়নি, আবার চেষ্টা করুন।", "⚠️"); return; }
+      if (error) { await showAppAlert(t("amalSaveFailed"), "⚠️"); return; }
       if (!logsByGoal[goalId]) logsByGoal[goalId] = {};
       logsByGoal[goalId][dateStr] = completed;
       renderBacklog();
@@ -372,12 +372,13 @@
 
     function renderStreakCard(streak, done, total) {
       document.getElementById("streakNum").textContent = toBn(streak);
-      document.getElementById("todayProgressLabel").textContent = `আজ ${toBn(done)}/${toBn(total)} সম্পন্ন`;
+      document.getElementById("todayProgressLabel").textContent = t("amalTodayProgress").replace("{done}", toBn(done)).replace("{total}", toBn(total));
       const pct = total > 0 ? Math.round((done / total) * 100) : 0;
       document.getElementById("todayProgressFill").style.width = pct + "%";
     }
 
     function toBn(n) {
+      if (getLang() === "en") return String(n);
       const map = { 0: "০", 1: "১", 2: "২", 3: "৩", 4: "৪", 5: "৫", 6: "৬", 7: "৭", 8: "৮", 9: "৯" };
       return String(n).replace(/[0-9]/g, (d) => map[d]);
     }
@@ -428,7 +429,7 @@
     document.getElementById("saveGoalBtn").addEventListener("click", async () => {
       const title = document.getElementById("newGoalTitle").value.trim();
       const target = document.getElementById("newGoalTarget").value.trim();
-      if (!title) { await showAppAlert("আমলের নাম দিন।", "⚠️"); return; }
+      if (!title) { await showAppAlert(t("amalEnterTitle"), "⚠️"); return; }
 
       const { error } = await db.from("amal_goals").insert({
         user_id: currentUserId,
@@ -436,7 +437,7 @@
         target_label: target || null,
         sort_order: allGoals.length,
       });
-      if (error) { await showAppAlert("যোগ করা যায়নি, আবার চেষ্টা করুন।", "⚠️"); return; }
+      if (error) { await showAppAlert(t("amalAddFailed"), "⚠️"); return; }
 
       document.getElementById("newGoalTitle").value = "";
       document.getElementById("newGoalTarget").value = "";
@@ -445,10 +446,10 @@
     });
 
     async function deleteGoal(goalId) {
-      const ok = await showAppConfirm("এই আমলটি ও এর সব হিস্ট্রি মুছে ফেলতে চান?", "🗑️");
+      const ok = await showAppConfirm(t("amalConfirmDelete"), "🗑️");
       if (!ok) return;
       const { error } = await db.from("amal_goals").delete().eq("id", goalId);
-      if (error) { await showAppAlert("মুছে ফেলা যায়নি।", "⚠️"); return; }
+      if (error) { await showAppAlert(t("amalDeleteFailed"), "⚠️"); return; }
       await loadAll();
     }
   </script>

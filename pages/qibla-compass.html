@@ -65,9 +65,9 @@
         <button class="back-btn" onclick="window.location.href='settings.html'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
         </button>
-        <h1 style="margin:0;">🕋 কিবলা কম্পাস</h1>
+        <h1 style="margin:0;" data-i18n="qiblaTitle">🕋 কিবলা কম্পাস</h1>
       </div>
-      <p>ফোন সমতল রেখে ধরুন, কাবা শরীফের দিক দেখাবে</p>
+      <p data-i18n="qiblaSubtitle">ফোন সমতল রেখে ধরুন, কাবা শরীফের দিক দেখাবে</p>
     </header>
 
     <main class="screen" style="margin-top:-24px;">
@@ -75,8 +75,8 @@
       <div class="card" id="gateCard">
         <div class="gate-box">
           <div class="emoji">🧭</div>
-          <p class="small muted" style="max-width:280px; margin:0 auto 16px;">সঠিক কিবলার দিক দেখাতে আপনার লোকেশন ও ফোনের কম্পাস সেন্সর ব্যবহারের অনুমতি প্রয়োজন।</p>
-          <button class="btn btn--primary" id="startBtn">চালু করুন</button>
+          <p class="small muted" style="max-width:280px; margin:0 auto 16px;" data-i18n="qiblaPermHint">সঠিক কিবলার দিক দেখাতে আপনার লোকেশন ও ফোনের কম্পাস সেন্সর ব্যবহারের অনুমতি প্রয়োজন।</p>
+          <button class="btn btn--primary" id="startBtn" data-i18n="qiblaStartBtn">চালু করুন</button>
           <p class="small muted" id="gateError" style="color: var(--danger); margin-top:12px; display:none;"></p>
         </div>
       </div>
@@ -85,7 +85,7 @@
         <div class="card">
           <div class="compass-wrap">
             <div class="compass-ring" id="ring">
-              <span class="tick-n">উত্তর</span>
+              <span class="tick-n" data-i18n="qiblaNorth">উত্তর</span>
               <div class="kaaba-pointer" id="pointer">
                 <span class="icon">🕋</span>
                 <span class="arrow"></span>
@@ -95,23 +95,23 @@
           </div>
           <div class="heading-readout">
             <div class="deg" id="degReadout">--°</div>
-            <div class="note">কাবা শরীফের দিকে ঘুরতে ফোনটি ধীরে ধীরে ঘোরান</div>
+            <div class="note" data-i18n="qiblaTurnHint">কাবা শরীফের দিকে ঘুরতে ফোনটি ধীরে ধীরে ঘোরান</div>
           </div>
-          <div class="aligned-msg" id="alignedMsg">✅ আপনি এখন কিবলামুখী</div>
+          <div class="aligned-msg" id="alignedMsg" data-i18n="qiblaAligned">✅ আপনি এখন কিবলামুখী</div>
         </div>
 
         <div class="card">
-          <div class="info-row"><span class="muted">কিবলার দিক (উত্তর থেকে)</span><span id="qiblaBearingText" style="font-weight:700;">--°</span></div>
-          <div class="info-row"><span class="muted">আপনার অবস্থান</span><span id="locText" style="font-weight:700;">--</span></div>
-          <div class="info-row"><span class="muted">কাবা শরীফ থেকে দূরত্ব</span><span id="distText" style="font-weight:700;">--</span></div>
+          <div class="info-row"><span class="muted" data-i18n="qiblaBearingLabel">কিবলার দিক (উত্তর থেকে)</span><span id="qiblaBearingText" style="font-weight:700;">--°</span></div>
+          <div class="info-row"><span class="muted" data-i18n="qiblaLocationLabel">আপনার অবস্থান</span><span id="locText" style="font-weight:700;">--</span></div>
+          <div class="info-row"><span class="muted" data-i18n="qiblaDistanceLabel">কাবা শরীফ থেকে দূরত্ব</span><span id="distText" style="font-weight:700;">--</span></div>
         </div>
 
         <div class="card calib-card">
           <div class="calib-figure8">🎚️</div>
-          <p class="small muted" style="margin:8px 0 0;">কম্পাস সঠিক না দেখালে ফোনটি হাতে নিয়ে <strong>৮ (আট)</strong> এর মতো আকারে কয়েকবার ঘোরান, তারপর আবার ফ্ল্যাট ধরুন।</p>
+          <p class="small muted" style="margin:8px 0 0;"><span data-i18n="qiblaCalibBefore">কম্পাস সঠিক না দেখালে ফোনটি হাতে নিয়ে </span><strong data-i18n="qiblaCalibBold">৮ (আট)</strong><span data-i18n="qiblaCalibAfter"> এর মতো আকারে কয়েকবার ঘোরান, তারপর আবার ফ্ল্যাট ধরুন।</span></p>
         </div>
 
-        <p class="small muted text-center" style="margin-top:4px;">লোহা/চুম্বক জাতীয় জিনিস বা ইলেকট্রনিক ডিভাইসের কাছে কম্পাস ভুল দেখাতে পারে।</p>
+        <p class="small muted text-center" style="margin-top:4px;" data-i18n="qiblaMagnetWarning">লোহা/চুম্বক জাতীয় জিনিস বা ইলেকট্রনিক ডিভাইসের কাছে কম্পাস ভুল দেখাতে পারে।</p>
       </div>
 
     </main>
@@ -119,23 +119,23 @@
     <nav class="bottom-nav">
       <a href="dashboard.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>হোম</span>
+        <span data-i18n="navHome">হোম</span>
       </a>
       <a href="bayan-list.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span>বায়ান</span>
+        <span data-i18n="navBayan">বায়ান</span>
       </a>
       <a href="dawat-list.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>দাওয়াত</span>
+        <span data-i18n="navDawat">দাওয়াত</span>
       </a>
       <a href="finance-list.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        <span>হিসাব</span>
+        <span data-i18n="navFinance">হিসাব</span>
       </a>
       <a href="settings.html" class="active">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        <span>সেটিংস</span>
+        <span data-i18n="navSettings">সেটিংস</span>
       </a>
     </nav>
   </div>
@@ -144,6 +144,7 @@
   <script src="../js/i18n.js"></script>
   <script src="../js/supabase-client.js"></script>
   <script>
+    applyTranslations();
     const KAABA_LAT = 21.4225;
     const KAABA_LON = 39.8262;
     let qiblaBearing = null;
@@ -175,6 +176,7 @@
     }
 
     function toBn(n) {
+      if (getLang() === "en") return String(n);
       const map = { 0: "০", 1: "১", 2: "২", 3: "৩", 4: "৪", 5: "৫", 6: "৬", 7: "৭", 8: "৮", 9: "৯" };
       return String(n).replace(/[0-9]/g, (d) => map[d]);
     }
@@ -192,7 +194,7 @@
           navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 });
         });
       } catch (e) {
-        errEl.textContent = "লোকেশন পাওয়া যায়নি। ফোনের সেটিংসে লোকেশন পারমিশন চালু করুন।";
+        errEl.textContent = t("qiblaLocError");
         errEl.style.display = "block";
         return;
       }
@@ -203,19 +205,19 @@
 
       document.getElementById("qiblaBearingText").textContent = toBn(Math.round(qiblaBearing)) + "°";
       document.getElementById("locText").textContent = toBn(lat.toFixed(2)) + "°, " + toBn(lon.toFixed(2)) + "°";
-      document.getElementById("distText").textContent = toBn(calcDistanceKm(lat, lon)) + " কিমি";
+      document.getElementById("distText").textContent = toBn(calcDistanceKm(lat, lon)) + t("qiblaKm");
 
       // ২) কম্পাস/অরিয়েন্টেশন সেন্সর পারমিশন (iOS ১৩+ এ আলাদাভাবে চাইতে হয়)
       if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
         try {
           const result = await DeviceOrientationEvent.requestPermission();
           if (result !== "granted") {
-            errEl.textContent = "কম্পাস সেন্সর ব্যবহারের অনুমতি পাওয়া যায়নি।";
+            errEl.textContent = t("qiblaSensorDenied");
             errEl.style.display = "block";
             return;
           }
         } catch (e) {
-          errEl.textContent = "এই ব্রাউজারে কম্পাস সেন্সর সমর্থিত নয়।";
+          errEl.textContent = t("qiblaSensorUnsupported");
           errEl.style.display = "block";
           return;
         }
@@ -229,7 +231,7 @@
       } else if (typeof DeviceOrientationEvent !== "undefined") {
         window.addEventListener("deviceorientation", handleOrientation, true);
       } else {
-        document.getElementById("degReadout").textContent = "সেন্সর নেই";
+        document.getElementById("degReadout").textContent = t("qiblaNoSensor");
       }
     }
 

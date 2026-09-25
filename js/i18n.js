@@ -146,6 +146,36 @@ const translations = {
     // ড্যাশবোর্ড সামারি কার্ড
     monthBalanceLabel: "এই মাসের ব্যালেন্স", monthDeficit: " (ঘাটতি)", hijriSuffix: " হি.",
     dawatViewList: "📋 লিস্ট", dawatViewCalendar: "🗓️ ক্যালেন্ডার", dawatCalNoDawat: "এই দিনে কোনো দাওয়াত নেই।", weekdaySuffix: "বার",
+
+    // আমল ট্র্যাকার
+    amalTitle: "🤲 আমল ট্র্যাকার", amalSubtitle: "প্রতিদিনের ইবাদতের ধারাবাহিকতা ধরে রাখুন",
+    amalStreakLabel: "ধারাবাহিক দিন", amalDaySuffix: "দিন",
+    amalEveningHint: "সন্ধ্যার পরে আজকের আমল যাচাই করাই ভালো।", amalCheckNow: "এখনই যাচাই করতে চাই",
+    amalEmpty: "এখনো কোনো আমল যোগ করা হয়নি।", amalAddGoal: "+ নতুন আমল যোগ করুন",
+    amalGoalTitle: "আমলের নাম", amalGoalTitlePh: "যেমন: দরূদ শরীফ",
+    amalGoalTarget: "দৈনিক টার্গেট (ঐচ্ছিক)", amalGoalTargetPh: "যেমন: ৫০০ বার / ৫ পৃষ্ঠা",
+    amalSave: "যোগ করুন", amalWeekly: "এই সপ্তাহের অগ্রগতি",
+    amalLoadError: "আমলের তথ্য লোড করা যায়নি।", amalEveningCheckHint: "সন্ধ্যার পরে আজকের অবস্থা যাচাই করুন।",
+    amalYesDone: "হ্যাঁ, সম্পন্ন হয়েছে", amalNo: "না",
+    amalDoneToday: "✅ আজ সম্পন্ন হয়েছে", amalNotDoneToday: "❌ আজ হয়নি", amalChangeAnswer: "পরিবর্তন করুন",
+    amalBacklogTitle: "⏳ মিস হওয়া এন্ট্রি পূরণ করুন", amalYesterday: "গতকাল", amalDayBefore: "তার আগের দিন",
+    amalSaveFailed: "সেভ করা যায়নি, আবার চেষ্টা করুন।", amalEnterTitle: "আমলের নাম দিন।",
+    amalAddFailed: "যোগ করা যায়নি, আবার চেষ্টা করুন।", amalConfirmDelete: "এই আমলটি ও এর সব হিস্ট্রি মুছে ফেলতে চান?",
+    amalDeleteFailed: "মুছে ফেলা যায়নি।", amalTodayProgress: "আজ {done}/{total} সম্পন্ন",
+
+    // কিবলা কম্পাস
+    qiblaTitle: "🕋 কিবলা কম্পাস", qiblaSubtitle: "ফোন সমতল রেখে ধরুন, কাবা শরীফের দিক দেখাবে",
+    qiblaPermHint: "সঠিক কিবলার দিক দেখাতে আপনার লোকেশন ও ফোনের কম্পাস সেন্সর ব্যবহারের অনুমতি প্রয়োজন।",
+    qiblaStartBtn: "চালু করুন", qiblaNorth: "উত্তর", qiblaTurnHint: "কাবা শরীফের দিকে ঘুরতে ফোনটি ধীরে ধীরে ঘোরান",
+    qiblaAligned: "✅ আপনি এখন কিবলামুখী",
+    qiblaBearingLabel: "কিবলার দিক (উত্তর থেকে)", qiblaLocationLabel: "আপনার অবস্থান", qiblaDistanceLabel: "কাবা শরীফ থেকে দূরত্ব", qiblaKm: " কিমি",
+    qiblaCalibBefore: "কম্পাস সঠিক না দেখালে ফোনটি হাতে নিয়ে ", qiblaCalibBold: "৮ (আট)", qiblaCalibAfter: " এর মতো আকারে কয়েকবার ঘোরান, তারপর আবার ফ্ল্যাট ধরুন।",
+    qiblaMagnetWarning: "লোহা/চুম্বক জাতীয় জিনিস বা ইলেকট্রনিক ডিভাইসের কাছে কম্পাস ভুল দেখাতে পারে।",
+    qiblaLocError: "লোকেশন পাওয়া যায়নি। ফোনের সেটিংসে লোকেশন পারমিশন চালু করুন।",
+    qiblaSensorDenied: "কম্পাস সেন্সর ব্যবহারের অনুমতি পাওয়া যায়নি।", qiblaSensorUnsupported: "এই ব্রাউজারে কম্পাস সেন্সর সমর্থিত নয়।",
+    qiblaNoSensor: "সেন্সর নেই",
+    settingsZakat: "যাকাত ক্যালকুলেটর", settingsIslamicCal: "ইসলামিক ক্যালেন্ডার", settingsAmal: "আমল ট্র্যাকার",
+    settingsQibla: "কিবলা কম্পাস", settingsTeam: "টিম সদস্য", settingsBackup: "ব্যাকআপ ও রিস্টোর",
   },
   en: {
     save: "Save", saving: "Saving...", cancel: "Cancel", delete: "Delete",
@@ -273,6 +303,38 @@ const translations = {
     // Dashboard summary card
     monthBalanceLabel: "This month's balance", monthDeficit: " (deficit)", hijriSuffix: " AH",
     dawatViewList: "📋 List", dawatViewCalendar: "🗓️ Calendar", dawatCalNoDawat: "No Dawat on this day.", weekdaySuffix: "",
+
+    // Amal tracker
+    amalTitle: "🤲 Amal Tracker", amalSubtitle: "Keep up your daily worship streak",
+    amalStreakLabel: "Day streak", amalDaySuffix: "days",
+    amalEveningHint: "It's best to check off today's Amal after evening.", amalCheckNow: "Check now anyway",
+    amalEmpty: "No Amal added yet.", amalAddGoal: "+ Add a new Amal",
+    amalGoalTitle: "Amal name", amalGoalTitlePh: "e.g. Durood Sharif",
+    amalGoalTarget: "Daily target (optional)", amalGoalTargetPh: "e.g. 500 times / 5 pages",
+    amalSave: "Add", amalWeekly: "This week's progress",
+    amalLoadError: "Couldn't load Amal data.", amalEveningCheckHint: "Check today's status after evening.",
+    amalYesDone: "Yes, done", amalNo: "No",
+    amalDoneToday: "✅ Done today", amalNotDoneToday: "❌ Not done today", amalChangeAnswer: "Change",
+    amalBacklogTitle: "⏳ Fill in missed entries", amalYesterday: "Yesterday", amalDayBefore: "The day before",
+    amalSaveFailed: "Couldn't save, please try again.", amalEnterTitle: "Enter the Amal's name.",
+    amalAddFailed: "Couldn't add, please try again.", amalConfirmDelete: "Delete this Amal and all its history?",
+    amalDeleteFailed: "Couldn't delete.", amalTodayProgress: "{done}/{total} done today",
+
+    // Qibla compass
+    qiblaTitle: "🕋 Qibla Compass", qiblaSubtitle: "Hold your phone flat — it'll point toward the Kaaba",
+    qiblaPermHint: "Location and compass sensor access are needed to show the correct Qibla direction.",
+    qiblaStartBtn: "Start", qiblaNorth: "North", qiblaTurnHint: "Slowly turn your phone to face the Kaaba",
+    qiblaAligned: "✅ You're facing the Qibla",
+    qiblaBearingLabel: "Qibla direction (from North)", qiblaLocationLabel: "Your location", qiblaDistanceLabel: "Distance from the Kaaba", qiblaKm: " km",
+    qiblaCalibBefore: "If the compass looks off, move your phone in a figure-",
+    qiblaCalibBold: "8",
+    qiblaCalibAfter: " shape a few times, then hold it flat again.",
+    qiblaMagnetWarning: "The compass can be inaccurate near metal, magnets, or electronic devices.",
+    qiblaLocError: "Couldn't get your location. Turn on location permission in your phone's settings.",
+    qiblaSensorDenied: "Compass sensor access wasn't granted.", qiblaSensorUnsupported: "This browser doesn't support the compass sensor.",
+    qiblaNoSensor: "No sensor",
+    settingsZakat: "Zakat Calculator", settingsIslamicCal: "Islamic Calendar", settingsAmal: "Amal Tracker",
+    settingsQibla: "Qibla Compass", settingsTeam: "Team Members", settingsBackup: "Backup & Restore",
   },
 };
 
