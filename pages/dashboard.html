@@ -281,6 +281,9 @@
         return;
       }
       hijriEl.textContent = azanData.hijri;
+      // ড্যাশবোর্ডের ওপরের সামারি কার্ডেও একই (Aladhan + বাংলাদেশ IF সমন্বয়) তারিখ বসানো হচ্ছে, যাতে দুই জায়গায় ভিন্ন তারিখ না দেখায়
+      const summaryHijriEl = document.getElementById("hijriSummaryDate");
+      if (summaryHijriEl) summaryHijriEl.textContent = azanData.hijri;
       noteEl.textContent = "";
       gridEl.innerHTML = Object.keys(PRAYER_LABELS)
         .map(
@@ -299,12 +302,21 @@
         const cached = sessionStorage.getItem(cacheKey);
         if (cached) return JSON.parse(cached);
 
+        const fmtDate = (d) => String(d.getDate()).padStart(2, "0") + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + d.getFullYear();
         const today = new Date();
-        const dateStr = String(today.getDate()).padStart(2, "0") + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + today.getFullYear();
-        const res = await fetch(`https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lng}&method=1`);
+        const yesterday = new Date(today.getTime() - 86400000);
+        const dateStr = fmtDate(today);
+
+        // হিজরি তারিখ Aladhan-এর নিজের হিসাব থেকেই নেওয়া হচ্ছে, কিন্তু "গতকাল"-এর তারিখ পাঠিয়ে —
+        // কারণ বাংলাদেশ ইসলামিক ফাউন্ডেশনের ঘোষণা সাধারণত Aladhan-এর হিসাবের চেয়ে ১ দিন পিছিয়ে থাকে
+        const [res, hRes] = await Promise.all([
+          fetch(`https://api.aladhan.com/v1/timings/${dateStr}?latitude=${lat}&longitude=${lng}&method=1`),
+          fetch(`https://api.aladhan.com/v1/gToH/${fmtDate(yesterday)}`),
+        ]);
         const json = await res.json();
+        const hJson = await hRes.json();
         const t = json.data.timings;
-        const h = json.data.date.hijri;
+        const h = hJson.data.hijri;
         const result = {
           timings: { fajr: t.Fajr, zuhr: t.Dhuhr, asr: t.Asr, maghrib: t.Maghrib, isha: t.Isha },
           hijri: h.day + " " + h.month.en + " " + h.year + " হি.",
